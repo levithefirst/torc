@@ -15,16 +15,16 @@ export function fmtLocal(ms: number) {
 }
 
 function StatusPill({ status, asOf, stale }: { status: LiveStatus; asOf?: number; stale?: boolean }) {
-  if (status === 'live' && !stale)
+  if ((status === 'live' || status === 'polling') && !stale && asOf && Date.now() - asOf < 30_000)
     return (
       <span data-testid="live-status" data-status="live" className="inline-flex items-center gap-1.5 text-[12px] text-text-2">
-        <span aria-hidden className="size-2 rounded-full bg-confirmed" /> live from {NETWORK} · Electrum
+        <span aria-hidden className="size-2 rounded-full bg-confirmed" /> live from {NETWORK} · {status === 'live' ? 'Electrum WebSocket' : 'server relay'}
       </span>
     );
   return (
     <span data-testid="live-status" data-status={status} className="inline-flex items-center gap-1.5 text-[12px] text-warning">
       <span aria-hidden className="size-2 rounded-full border border-warning" />
-      {asOf ? `as of ${fmtLocal(asOf)}` : 'chain not reached yet'} · {status === 'polling' ? 'via server' : 'reconnecting'}
+      {asOf ? `as of ${fmtLocal(asOf)}` : 'chain not reached yet'} · {status === 'polling' ? 'live via server' : status === 'connecting' ? 'connecting live feed' : 'reconnecting'}
     </span>
   );
 }

@@ -14,7 +14,8 @@
     "circle:create": "tsx scripts/circle-create.ts",
     "circle:tick": "tsx scripts/circle-tick.ts",
     "circle:inspect": "tsx scripts/circle-inspect.ts",
-    "prepare": "[ -d .git ] && scripts/install-hooks.sh || true"
+    "prepare": "[ -d .git ] && scripts/install-hooks.sh || true",
+    "fund:seats": "tsx scripts/fund-seats.ts"
   },
   "dependencies": {
     "@bitauth/libauth": "3.0.0",

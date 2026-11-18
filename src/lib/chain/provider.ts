@@ -29,7 +29,7 @@ export class TorcProvider implements NetworkProvider {
     return this.getUtxosForLockingBytecode(binToHex(r.bytecode));
   }
 
-  async getUtxosForLockingBytecode(lockingBytecode: Uint8Array | string): Promise<SpendableUtxo[] & { height?: number }[]> {
+  async getUtxosForLockingBytecode(lockingBytecode: Uint8Array | string): Promise<(SpendableUtxo & { height?: number })[]> {
     const hex = typeof lockingBytecode === 'string' ? lockingBytecode : binToHex(lockingBytecode);
     const res = (await this.call('blockchain.scripthash.listunspent', scripthashOf(hex), 'include_tokens')) as RawUtxo[];
     return res.map((u) => ({

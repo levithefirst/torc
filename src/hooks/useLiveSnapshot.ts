@@ -18,6 +18,21 @@ export function useLiveSnapshot(params: CircleParams | null, initial: Snapshot |
   const providerRef = useRef<TorcProvider | null>(null);
   const busy = useRef(false);
   const again = useRef(false);
+  const electrumOk = useRef(false);
+
+  const fetchServer = useCallback(async () => {
+    if (!params) return;
+    try {
+      const r = await fetch(`/api/circle?address=${encodeURIComponent(addressOf(params))}`, { cache: 'no-store' });
+      if (r.ok) {
+        const s = (await r.json()) as Snapshot;
+        setSnap((cur) => (cur && cur.asOf > s.asOf ? cur : s));
+        if (!electrumOk.current) setStatus('polling');
+      } else if (!electrumOk.current) setStatus('offline');
+    } catch {
+      if (!electrumOk.current) setStatus('offline');
+    }
+  }, [params]);
 
   const refresh = useCallback(async () => {
     if (!params) return;
@@ -26,32 +41,35 @@ export function useLiveSnapshot(params: CircleParams | null, initial: Snapshot |
     try {
       do {
         again.current = false;
-        try {
-          if (!providerRef.current) throw new Error('no provider');
-          const s = await readSnapshot(providerRef.current, params);
-          setSnap(s);
-          setStatus('live');
-        } catch {
+        if (electrumOk.current && providerRef.current) {
           try {
-            const r = await fetch(`/api/circle?address=${encodeURIComponent(addressOf(params))}`, { cache: 'no-store' });
-            if (r.ok) { setSnap(await r.json()); setStatus('polling'); } else setStatus('offline');
-          } catch { setStatus('offline'); }
+            const s = await readSnapshot(providerRef.current, params);
+            setSnap(s);
+            setStatus('live');
+          } catch {
+            electrumOk.current = false;
+            await fetchServer();
+          }
+        } else {
+          await fetchServer();
         }
       } while (again.current);
     } finally {
       busy.current = false;
     }
-  }, [params]);
+  }, [params, fetchServer]);
 
   useEffect(() => {
     if (!params) return;
     let cancelled = false;
     const hosts = electrumHosts();
     let unsub: (() => void) | undefined;
+    // Server snapshot right away (fast path); Electrum WebSocket in parallel for live updates.
+    if (!initial || Date.now() - initial.asOf > 15_000) fetchServer();
     (async () => {
       providerRef.current = new TorcProvider(electrumCaller(hosts, 6000), NETWORK);
       try {
-        const client = await electrumClient(hosts, 6000);
+        const client = await electrumClient(hosts, 4000);
         if (cancelled) return;
         const sh = scripthashOf(lockOf(params));
         const onNote = (n: { method: string; params?: unknown[] }) => {
@@ -65,16 +83,18 @@ export function useLiveSnapshot(params: CircleParams | null, initial: Snapshot |
           client.off('notification', onNote as never);
           client.unsubscribe('blockchain.scripthash.subscribe', sh).catch(() => {});
         };
+        electrumOk.current = true;
         setStatus('live');
+        refresh();
       } catch {
         resetElectrum(hosts);
-        setStatus('polling');
+        if (!cancelled) setStatus((s) => (s === 'connecting' ? 'polling' : s));
       }
-      refresh();
     })();
-    const iv = setInterval(refresh, 20_000);
+    // Without a WebSocket, poll the server every 4 s; with one, a slow safety refresh.
+    const iv = setInterval(() => { if (!electrumOk.current || Math.random() < 0.2) refresh(); }, 4_000);
     return () => { cancelled = true; clearInterval(iv); unsub?.(); };
-  }, [params, refresh]);
+  }, [params, refresh, fetchServer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { snap, status, refresh, setSnap };
 }

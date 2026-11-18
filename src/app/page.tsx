@@ -12,9 +12,9 @@ export default async function Home() {
   const r = DEMO ? await getSnapshot(DEMO.params) : { snap: null, stale: true };
   return (
     <>
-      <section className="py-6">
-        <h1 className="max-w-2xl text-2xl font-semibold leading-snug tracking-tight sm:text-3xl">{PITCH}</h1>
-        <p className="mt-3 max-w-2xl text-text-2">
+      <section className="pb-5 pt-2 sm:py-6">
+        <h1 className="max-w-2xl text-lg font-semibold leading-snug tracking-tight sm:text-3xl">{PITCH}</h1>
+        <p className="mt-2 hidden max-w-2xl text-text-2 sm:block">
           {BRAND_NAME} is an ajo / esusu savings circle on Bitcoin Cash. Each member pays a fixed amount every round and a covenant pays the
           whole pot to the member whose turn it is. Below is a real circle, read straight from the chain.{' '}
           <Link href="/new" className="text-accent-text underline underline-offset-2">Start your own</Link>.

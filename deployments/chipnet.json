@@ -1,5 +1,5 @@
 {
-  "name": "Lagos Market Circle (CLI run)",
+  "name": "Lagos Market Circle",
   "network": "chipnet",
   "params": {
     "network": "chipnet",
@@ -8,49 +8,24 @@
     "contribution": "10",
     "seats": 3,
     "period": 600,
-    "circleCategory": "6ff7ea6b506d585b74ec07bec59cb4a68190dff06bff5350c1bd2c0ea7f9923f"
+    "circleCategory": "4bf81dc45e4b0a7119472fda233583aba81705fc1c59c23d6528240ed66dab94"
   },
-  "covenantAddress": "bchtest:p0dqyvgvlx5kvcd7wnx2fth23j7ssx4r54hgpzeekj808pj5crjlv7c9nu074",
-  "covenantTokenAddress": "bchtest:r0dqyvgvlx5kvcd7wnx2fth23j7ssx4r54hgpzeekj808pj5crjlvvtej9w87",
+  "covenantAddress": "bchtest:pwn42zlapczu660my03ws0m7kfl6pl4350q4dvgvat0459n95wj6zfm4t4gzr",
+  "covenantTokenAddress": "bchtest:rwn42zlapczu660my03ws0m7kfl6pl4350q4dvgvat0459n95wj6zmgf2vfmg",
   "seatNames": [
     "Ade",
     "Bisi",
     "Chidi"
   ],
-  "seatKeys": [
-    "ade",
-    "bisi",
-    "chidi"
-  ],
-  "genesisTxid": "ed8fbac3c0077496dde57103d69d6ed8b165e97745b74093eaf4e54d90e49069",
+  "seatKeys": [],
+  "genesisTxid": "2111a3201b391b1a3e7aadb0b81b5774a8df09a31578d2aa09cbb07a545869cb",
   "assetName": "tPUSD",
   "assetDecimals": 2,
   "events": [
     {
       "kind": "genesis",
-      "txid": "ed8fbac3c0077496dde57103d69d6ed8b165e97745b74093eaf4e54d90e49069",
-      "at": "2026-11-18T18:35:46.702Z"
-    },
-    {
-      "kind": "contribute",
-      "txid": "c10da426d0269983997d1998fcf81846b0e022685e6ca01a4df41977c64ab6e9",
-      "seat": 1,
-      "round": 0,
-      "at": "2026-11-18T18:35:54.974Z"
-    },
-    {
-      "kind": "contribute",
-      "txid": "72f3e85ba85f062f0550ee980d7aa0a4217aaf528b321cb32c480484cbc86159",
-      "seat": 2,
-      "round": 0,
-      "at": "2026-11-18T18:35:56.347Z"
-    },
-    {
-      "kind": "contribute",
-      "txid": "119ab992af03fe2d93df81e9ea80be1c2daa0a1b6373b73fd31b536d3c010898",
-      "seat": 0,
-      "round": 0,
-      "at": "2026-11-18T18:35:57.549Z"
+      "txid": "2111a3201b391b1a3e7aadb0b81b5774a8df09a31578d2aa09cbb07a545869cb",
+      "at": "2026-11-18T18:47:05.906Z"
     }
   ]
 }
