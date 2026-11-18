@@ -70,7 +70,7 @@ try {
       if (have) break;
       await new Promise((r) => setTimeout(r, 3000));
     }
-    let inv = await engine.createInvitation({ templateIdentifier, actionIdentifier: 'contribute', roleIdentifier: 'member', intent: { action: 'contribute', role: 'member' } });
+    let inv = await engine.createInvitation({ templateIdentifier, actionIdentifier: 'contribute', intent: { action: 'contribute', role: 'member' } });
     const id = idOf(inv);
     log('invitation', id);
     log('requirements', await engine.listRequirements(inv.invitation ?? inv));
@@ -86,7 +86,7 @@ try {
     inv = await engine.appendInvitation(id, {
       outputs: [{ outputIdentifier: 'stateOutput' }, { outputIdentifier: 'contributionOutput' }, { outputIdentifier: 'seatReturnOutput' }, { outputIdentifier: 'paymentChangeOutput' }],
     });
-    inv = await engine.appendInvitation(id, { locktime: 0, version: 2 });
+    inv = await engine.appendInvitation(id, { transactionLocktime: 0, transactionVersion: 2 });
     log('missing requirements', await engine.listMissingRequirements(id));
     for (const idx of await engine.listOwnInputIndexes(id).catch(() => [])) {
       try { inv = await engine.signInvitation(id, idx); } catch (e) { log(`sign ${idx}`, String(e?.message ?? e)); }
