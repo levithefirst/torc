@@ -51,6 +51,34 @@
       "seat": 0,
       "round": 0,
       "at": "2026-11-18T18:35:57.549Z"
+    },
+    {
+      "kind": "claim",
+      "txid": "323517261421012fca63ccfbba9c08855f824f8ad4e90f91359c617d62d1f75f",
+      "seat": 0,
+      "round": 0,
+      "at": "2026-11-18T18:50:52.753Z"
+    },
+    {
+      "kind": "contribute",
+      "txid": "b3049d899cb5d0abbc0815125dccc72d7fbd6fff267b0105bcefc245a2a3cd9f",
+      "seat": 2,
+      "round": 1,
+      "at": "2026-11-18T18:50:54.305Z"
+    },
+    {
+      "kind": "contribute",
+      "txid": "58b49894de80e85498f28765e50f2d876ffd41dffc92dd2567290f1a90d780b6",
+      "seat": 0,
+      "round": 1,
+      "at": "2026-11-18T18:50:55.619Z"
+    },
+    {
+      "kind": "contribute",
+      "txid": "e3224a3a77ad4b5c9f04befac3cb1fd5b2115812e5688048c65bc0e8eb454d6e",
+      "seat": 1,
+      "round": 1,
+      "at": "2026-11-18T18:50:56.918Z"
     }
   ]
 }
