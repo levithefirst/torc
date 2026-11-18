@@ -8,6 +8,7 @@ import { toTokenAddress } from '../src/lib/torc/address';
 const to = arg('to')!.split(',');
 const sats = BigInt(arg('sats', '500000')!);
 const tokens = BigInt(arg('tokens', NETWORK === 'chipnet' ? '10000' : '0')!);
+const tokenSats = BigInt(arg('token-sats', '1000')!);
 const p = provider();
 const w = await walletOf(p, arg('from', 'treasury')!);
 const tb = new TransactionBuilder({ provider: p });
@@ -18,7 +19,7 @@ if (tokens > 0n) {
   const ft = w.utxos.filter((u) => u.token?.category === asset && !u.token.nft);
   let have = 0n;
   for (const u of ft) { tb.addInput(u, w.key.sig.unlockP2PKH()); have += u.token!.amount; }
-  for (const a of to) tb.addOutput({ to: toTokenAddress(a), amount: 1000n, token: { category: asset, amount: tokens } });
+  for (const a of to) tb.addOutput({ to: toTokenAddress(a), amount: tokenSats, token: { category: asset, amount: tokens } });
   tb.addOutput({ to: w.key.tokenAddress, amount: 1000n, token: { category: asset, amount: have - tokens * BigInt(to.length) } });
 }
 for (const a of to) tb.addOutput({ to: a, amount: sats });

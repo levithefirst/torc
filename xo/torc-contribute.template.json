@@ -1,0 +1,458 @@
+{
+  "$schema": "https://libauth.org/schemas/wallet-template-v0.schema.json",
+  "name": "Torc circle",
+  "description": "Rotating savings circle (ajo / esusu): every member pays a fixed amount each round into a covenant that pays the whole pot only to the member whose turn it is.",
+  "icon": "circle",
+  "version": "1",
+  "supported": [
+    "BCH_2025_05",
+    "BCH_2026_05"
+  ],
+  "resources": [
+    {
+      "name": "Torc covenant source",
+      "description": "contracts/TorcCircle.cash (CashScript 0.14). The redeem script below is its compiled bytecode.",
+      "url": "https://github.com/levithefirst/torc/blob/main/contracts/TorcCircle.cash"
+    }
+  ],
+  "roles": {
+    "member": {
+      "name": "Member",
+      "description": "Holds a seat NFT of the circle and pays the fixed contribution each round.",
+      "icon": "user"
+    },
+    "circle": {
+      "name": "Circle",
+      "description": "The Torc app: supplies the circle’s live state NFT UTXO and its parameters.",
+      "icon": "contract"
+    }
+  },
+  "start": [
+    {
+      "action": "receiveSeat",
+      "role": "member",
+      "generate": [
+        "memberKey"
+      ]
+    }
+  ],
+  "actions": {
+    "receiveSeat": {
+      "name": "Receive a seat",
+      "description": "Get a key-controlled address to receive a circle seat NFT and the asset to pay with.",
+      "icon": "receive",
+      "roles": {
+        "member": {
+          "name": "Receive a seat",
+          "description": "Receive a seat NFT at a key this wallet controls.",
+          "icon": "receive",
+          "requirements": {
+            "secrets": [
+              "memberKey"
+            ]
+          }
+        }
+      },
+      "requirements": {
+        "participants": [
+          {
+            "role": "member",
+            "slots": {
+              "min": 1,
+              "max": 1
+            }
+          }
+        ]
+      },
+      "transaction": "receiveSeatTransaction"
+    },
+    "contribute": {
+      "name": "Pay into the circle",
+      "description": "Pay this round’s fixed contribution into the Torc covenant. The covenant marks the seat as paid.",
+      "icon": "send",
+      "roles": {
+        "member": {
+          "name": "Pay into the circle",
+          "description": "Pay $(<contribution>) units of the circle asset for seat $(<seatCommitment> <1> OP_SPLIT OP_DROP OP_BIN2NUM <1> OP_ADD).",
+          "icon": "send",
+          "requirements": {
+            "variables": [
+              "seatCommitment",
+              "seatSatoshis",
+              "paymentTokens",
+              "paymentSatoshis",
+              "memberLockingScript"
+            ]
+          }
+        },
+        "circle": {
+          "name": "Provide circle state",
+          "description": "Supply the circle’s current state UTXO and parameters.",
+          "icon": "contract",
+          "requirements": {
+            "variables": [
+              "circleCategory",
+              "assetCategory",
+              "contribution",
+              "seats",
+              "period",
+              "stateSatoshis",
+              "stateCommitment"
+            ]
+          }
+        }
+      },
+      "requirements": {
+        "participants": [
+          {
+            "role": "member",
+            "slots": {
+              "min": 1,
+              "max": 1
+            }
+          },
+          {
+            "role": "circle",
+            "slots": {
+              "min": 1,
+              "max": 1
+            }
+          }
+        ]
+      },
+      "transaction": "contributeTransaction"
+    }
+  },
+  "transactions": {
+    "receiveSeatTransaction": {
+      "name": "Received a seat",
+      "description": "Received a Torc seat.",
+      "icon": "receive",
+      "inputs": [],
+      "outputs": [
+        {
+          "output": "seatReceiveOutput"
+        }
+      ]
+    },
+    "contributeTransaction": {
+      "name": "Paid into the circle",
+      "description": "Paid $(<contribution>) into a Torc circle; next state $(nextStateCommitment).",
+      "icon": "send",
+      "inputs": [
+        {
+          "input": "stateInput",
+          "inputIndex": 0
+        },
+        {
+          "input": "seatInput",
+          "inputIndex": 1
+        },
+        {
+          "input": "paymentInput",
+          "inputIndex": 2
+        }
+      ],
+      "outputs": [
+        {
+          "output": "stateOutput",
+          "outputIndex": 0
+        },
+        {
+          "output": "contributionOutput",
+          "outputIndex": 1
+        },
+        {
+          "output": "seatReturnOutput",
+          "outputIndex": 2
+        },
+        {
+          "output": "paymentChangeOutput",
+          "outputIndex": 3
+        }
+      ]
+    }
+  },
+  "inputs": {
+    "stateInput": {
+      "name": "Circle state",
+      "description": "The circle’s state NFT (round, round start, paid seats).",
+      "icon": "contract",
+      "valueSatoshis": "$(<stateSatoshis>)",
+      "token": {
+        "category": "$(<circleCategory>)",
+        "amount": "0",
+        "nft": {
+          "capability": "mutable",
+          "commitment": "$(<stateCommitment>)"
+        }
+      },
+      "unlockingScript": "unlockContribute"
+    },
+    "seatInput": {
+      "name": "Your seat",
+      "description": "The member NFT that proves which seat is paying.",
+      "icon": "ticket",
+      "valueSatoshis": "$(<seatSatoshis>)",
+      "token": {
+        "category": "$(<circleCategory>)",
+        "amount": "0",
+        "nft": {
+          "capability": "none",
+          "commitment": "$(<seatCommitment>)"
+        }
+      },
+      "unlockingScript": "unlockSeat"
+    },
+    "paymentInput": {
+      "name": "Payment",
+      "description": "The asset tokens (and sats) that pay the contribution and the miner fee.",
+      "icon": "send",
+      "valueSatoshis": "$(<paymentSatoshis>)",
+      "token": {
+        "category": "$(<assetCategory>)",
+        "amount": "$(<paymentTokens>)",
+        "nft": null
+      },
+      "unlockingScript": "unlockSeat"
+    }
+  },
+  "outputs": {
+    "seatReceiveOutput": {
+      "name": "Seat address",
+      "description": "Where the circle organizer sends this member’s seat NFT and asset.",
+      "icon": "receive",
+      "lockingScript": "seatLockingScript"
+    },
+    "stateOutput": {
+      "name": "Circle state",
+      "description": "State NFT with this seat’s paid bit set. Same round, same round start.",
+      "icon": "contract",
+      "lockingScript": "torcCovenant",
+      "valueSatoshis": "$(<stateSatoshis>)",
+      "token": {
+        "category": "$(<circleCategory>)",
+        "amount": "0",
+        "nft": {
+          "capability": "mutable",
+          "commitment": "$(nextStateCommitment)"
+        }
+      },
+      "roles": {
+        "member": {
+          "relevant": false
+        }
+      }
+    },
+    "contributionOutput": {
+      "name": "Contribution",
+      "description": "Exactly one contribution, locked in the circle until the turn seat claims the pot.",
+      "icon": "contract",
+      "lockingScript": "torcCovenant",
+      "valueSatoshis": "$(<contributionDust>)",
+      "token": {
+        "category": "$(<assetCategory>)",
+        "amount": "$(<contribution>)",
+        "nft": null
+      }
+    },
+    "seatReturnOutput": {
+      "name": "Your seat",
+      "description": "The member NFT, returned unchanged.",
+      "icon": "ticket",
+      "lockingScript": "$(<memberLockingScript>)",
+      "valueSatoshis": "$(<seatSatoshis>)",
+      "token": {
+        "category": "$(<circleCategory>)",
+        "amount": "0",
+        "nft": {
+          "capability": "none",
+          "commitment": "$(<seatCommitment>)"
+        }
+      }
+    },
+    "paymentChangeOutput": {
+      "name": "Asset change",
+      "description": "Remaining asset tokens and sats back to the member, after the contribution and the miner fee.",
+      "icon": "receive",
+      "lockingScript": "$(<memberLockingScript>)",
+      "valueSatoshis": "$(<paymentSatoshis> <contributionDust> OP_SUB <minerFeeSatoshis> OP_SUB)",
+      "token": {
+        "category": "$(<assetCategory>)",
+        "amount": "$(<paymentTokens> <contribution> OP_SUB)",
+        "nft": null
+      }
+    }
+  },
+  "lockingScripts": {
+    "torcCovenant": {
+      "name": "Torc covenant",
+      "description": "P2SH32 TorcCircle covenant: holds the state NFT and the pot. Pays only the turn seat.",
+      "icon": "contract",
+      "lockingType": "p2sh",
+      "lockingBytecode": "torcLockingBytecode",
+      "selectable": false,
+      "roles": {
+        "member": {
+          "relevant": false
+        }
+      }
+    },
+    "seatLockingScript": {
+      "name": "Seat key",
+      "description": "A key this wallet controls, holding the member NFT and the asset to pay with.",
+      "icon": "address",
+      "lockingType": "p2pkh",
+      "lockingBytecode": "lockSeat",
+      "unlockingBytecode": "unlockSeat",
+      "roles": {
+        "member": {
+          "state": {
+            "variables": [],
+            "secrets": [
+              "memberKey"
+            ]
+          },
+          "actions": [
+            {
+              "action": "contribute",
+              "role": "member",
+              "secrets": [
+                {
+                  "memberKey": null
+                }
+              ]
+            }
+          ],
+          "balance": {
+            "satoshis": true,
+            "fungibleTokens": true,
+            "nonfungibleTokens": true
+          },
+          "selectable": true
+        }
+      }
+    }
+  },
+  "scripts": {
+    "torcRedeemBytecode": "<period> <seats> <contribution> <$(<assetCategory> OP_REVERSEBYTES)> <$(<circleCategory> OP_REVERSEBYTES)> 0x5579009c63c0009d00c778517e00ce788851ce53798851cf517f758176577a9f6900cf76557f7781050102040810537a7f77517f75816e965297009d00cd55798800d1547a8800cc00c69d00d3009d00d2537a557f75729351807e8851cd8851d17b8851d37b9d51cc02e8039d52cd51c78852d18852d251cf877777675579519c63c0009d00c778517e00ce788851ce53798800cf76517f7501007e8178517f77547f75817b557f778151cf517f758153795a79979d0601020408102059797f77517f75818c9d7802ff009f69587a93b17500cd53798800d17b8800cc00c69d00d3009d8b5280517f7500d27cc554807e01007e88c355795293a26952c7788852ce53798852d054799d53c7788853ce53798853d054799d54c7788854ce53798854d054799d547953a06355c7788855ce53798855d054799d68547954a06356c7788856ce53798856d054799d6851cd51c78851d1537a8851d3537a547a959d52cd51c78852d17b8852d251cf87777767557a529dc052a269c0547a8ba169c0c700c78800ce7c517e8800d2517f7500cf517f7587917777776868",
+    "torcLockingBytecode": "OP_HASH256 <$(<torcRedeemBytecode> OP_HASH256)> OP_EQUAL",
+    "unlockContribute": "<0> <torcRedeemBytecode>",
+    "lockSeat": "OP_DUP OP_HASH160 <$(<memberKey.public_key> OP_HASH160)> OP_EQUALVERIFY OP_CHECKSIG",
+    "unlockSeat": "<memberKey.schnorr_signature.all_outputs> <memberKey.public_key>",
+    "seatBit": "<0x0102040810> <$(<seatCommitment> <1> OP_SPLIT OP_DROP OP_BIN2NUM)> OP_SPLIT OP_NIP <1> OP_SPLIT OP_DROP OP_BIN2NUM",
+    "nextStateCommitment": "<stateCommitment> <5> OP_SPLIT OP_BIN2NUM seatBit OP_ADD <1> OP_NUM2BIN OP_CAT"
+  },
+  "constants": {
+    "contributionDust": {
+      "name": "Contribution dust",
+      "description": "Sats every contribution UTXO carries (enforced by the covenant).",
+      "icon": "coins",
+      "type": "satoshis",
+      "value": "1000"
+    },
+    "minerFeeSatoshis": {
+      "name": "Miner fee",
+      "description": "Fixed fee for a contribute transaction (~1.3 kB at 1 sat/byte).",
+      "icon": "coins",
+      "type": "satoshis",
+      "value": "1600"
+    }
+  },
+  "variables": {
+    "memberKey": {
+      "name": "Seat key",
+      "description": "The private key controlling this member’s seat NFT.",
+      "icon": "key",
+      "type": "private_key"
+    },
+    "circleCategory": {
+      "name": "Circle",
+      "description": "Category of the circle’s state and member NFTs.",
+      "icon": "circle",
+      "type": "token_category"
+    },
+    "assetCategory": {
+      "name": "Asset",
+      "description": "The fungible token the circle saves in (PUSD on mainnet, tPUSD on chipnet).",
+      "icon": "coins",
+      "type": "token_category"
+    },
+    "contribution": {
+      "name": "Contribution",
+      "description": "Fixed amount each member pays per round, in token base units.",
+      "icon": "coins",
+      "type": "token_amount"
+    },
+    "seats": {
+      "name": "Seats",
+      "description": "Number of members (3 to 5).",
+      "icon": "users",
+      "type": "integer"
+    },
+    "period": {
+      "name": "Round length",
+      "description": "Minimum seconds between payouts.",
+      "icon": "clock",
+      "type": "integer"
+    },
+    "stateSatoshis": {
+      "name": "State sats",
+      "description": "Sats on the state NFT UTXO (constant).",
+      "icon": "coins",
+      "type": "satoshis"
+    },
+    "stateCommitment": {
+      "name": "Circle state",
+      "description": "round (1) | roundStart (4 LE) | paidMask (1).",
+      "icon": "contract",
+      "type": "bytes"
+    },
+    "seatCommitment": {
+      "name": "Seat",
+      "description": "Member NFT commitment: seat index (1) | version (1).",
+      "icon": "ticket",
+      "type": "bytes"
+    },
+    "seatSatoshis": {
+      "name": "Seat sats",
+      "description": "Sats on the member NFT UTXO.",
+      "icon": "coins",
+      "type": "satoshis"
+    },
+    "paymentTokens": {
+      "name": "Payment tokens",
+      "description": "Asset amount on the payment UTXO.",
+      "icon": "coins",
+      "type": "token_amount"
+    },
+    "memberLockingScript": {
+      "name": "Back to you",
+      "description": "Where the seat NFT and change return: the seat key’s own locking script (the covenant requires the NFT to return to the spender).",
+      "icon": "address",
+      "type": "locking_script"
+    },
+    "paymentSatoshis": {
+      "name": "Payment sats",
+      "description": "Sats on the payment UTXO (pays dust + fee).",
+      "icon": "coins",
+      "type": "satoshis"
+    }
+  },
+  "defaults": {
+    "address": {
+      "lockingScript": "seatLockingScript",
+      "role": "member",
+      "generate": [
+        "memberKey"
+      ]
+    },
+    "receive": {
+      "output": "seatReceiveOutput",
+      "role": "member",
+      "generate": [
+        "memberKey"
+      ]
+    }
+  }
+}

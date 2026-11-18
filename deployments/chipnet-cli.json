@@ -86,6 +86,34 @@
       "txid": "ed0ead843e5c1d0dd2b405407610314223eeac4a799a37533631a98161f87bc1",
       "seat": 2,
       "at": "2026-11-18T18:56:10.802Z"
+    },
+    {
+      "kind": "claim",
+      "txid": "2db05ee5b6861441a7d2fff1244c1887fafb290ee07b9434161ffaf0f24d8e77",
+      "seat": 1,
+      "round": 1,
+      "at": "2026-11-18T19:01:07.927Z"
+    },
+    {
+      "kind": "contribute",
+      "txid": "56bd7531233be1cad20df6e8fd33def9a9c6f656c5ce587ab35d0266ebc54cd2",
+      "seat": 0,
+      "round": 2,
+      "at": "2026-11-18T19:01:09.227Z"
+    },
+    {
+      "kind": "contribute",
+      "txid": "1df276a9947d520f383e38195a36da0bcd9dc4feae432064d2fa9e6dbb6066f8",
+      "seat": 1,
+      "round": 2,
+      "at": "2026-11-18T19:01:10.547Z"
+    },
+    {
+      "kind": "contribute",
+      "txid": "28d9194b95894e18401c8aa746feb183e15eea6e788f7b3984623aec14cbe2d8",
+      "seat": 2,
+      "round": 2,
+      "at": "2026-11-18T19:01:11.946Z"
     }
   ]
 }

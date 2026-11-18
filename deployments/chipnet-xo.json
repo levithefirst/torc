@@ -1,0 +1,34 @@
+{
+  "name": "XO Circle",
+  "network": "chipnet",
+  "params": {
+    "network": "chipnet",
+    "mode": "token",
+    "assetCategory": "fb9175ea28b49f530d1e21d521f52c91cf52db90c07af4c5bffbb85fcbb725d4",
+    "contribution": "10",
+    "seats": 3,
+    "period": 600,
+    "circleCategory": "1a4ea823e8a9aa544ab140731d86833f3544e36e47d83c13145142971efb0fd9"
+  },
+  "covenantAddress": "bchtest:pwcffrjtk6h4x6uyjwkh9x5skrjnz964meupzqfppyrxhpl0xw26vytknf58x",
+  "covenantTokenAddress": "bchtest:rwcffrjtk6h4x6uyjwkh9x5skrjnz964meupzqfppyrxhpl0xw26vkc2js47d",
+  "seatNames": [
+    "Yemi (XO wallet)",
+    "Ade",
+    "Bisi"
+  ],
+  "seatKeys": [
+    "ade",
+    "bisi"
+  ],
+  "genesisTxid": "33d76639a83c6f57b801082abecf4ae058bd38cdf67a61f926a9f327c081f60d",
+  "assetName": "tPUSD",
+  "assetDecimals": 2,
+  "events": [
+    {
+      "kind": "genesis",
+      "txid": "33d76639a83c6f57b801082abecf4ae058bd38cdf67a61f926a9f327c081f60d",
+      "at": "2026-11-18T19:11:00.577Z"
+    }
+  ]
+}
