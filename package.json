@@ -16,7 +16,8 @@
     "circle:inspect": "tsx scripts/circle-inspect.ts",
     "prepare": "[ -d .git ] && scripts/install-hooks.sh || true",
     "fund:seats": "tsx scripts/fund-seats.ts",
-    "seat:transfer": "tsx scripts/seat-transfer.ts"
+    "seat:transfer": "tsx scripts/seat-transfer.ts",
+    "docs:deployments": "tsx scripts/deployments-md.ts"
   },
   "dependencies": {
     "@bitauth/libauth": "3.0.0",
