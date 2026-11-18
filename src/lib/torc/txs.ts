@@ -39,7 +39,7 @@ export function findState(params: CircleParams, contractUtxos: SpendableUtxo[]):
 
 export function isContributionUtxo(params: CircleParams, u: SpendableUtxo): boolean {
   if (params.mode === 'token') {
-    return u.token?.category === params.assetCategory && !u.token.nft && u.token.amount === params.contribution;
+    return !!u.token && u.token.category === params.assetCategory && !u.token.nft && u.token.amount === params.contribution;
   }
   return !u.token && u.satoshis === params.contribution;
 }
@@ -170,7 +170,7 @@ export function buildContribute(opts: {
   if (params.mode === 'token') {
     // Fungible token inputs of the asset, largest first.
     const ft = wallet.utxos
-      .filter((u) => u.token?.category === params.assetCategory && !u.token.nft)
+      .filter((u) => !!u.token && u.token.category === params.assetCategory && !u.token.nft)
       .sort((a, b) => Number(b.token!.amount - a.token!.amount));
     let have = 0n;
     for (const u of ft) {

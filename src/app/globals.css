@@ -1,0 +1,42 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Torc color theme: docs/color-theme.md is the source of truth (dark default, light tested). */
+:root {
+  --bg:#FBF9F5; --surface:#FFFFFF; --surface-2:#F4F1EC;
+  --border:#8A857E; --border-subtle:#E1DDD7;
+  --text:#1A1711; --text-2:#5F5A53;
+  --accent:#CFA354; --accent-hover:#C59542; --on-accent:#1A1711;
+  --accent-text:#7A510B; --focus:#1A1711;
+  --success:#287C42; --warning:#B35713; --danger:#C2272D;
+  --turn:#7A510B; --confirmed:#287C42; --mempool:#196EA9; --due:#5F5A53;
+  --radius:10px; --font-sans:var(--font-geist-sans),"Inter",system-ui,sans-serif; --font-mono:var(--font-geist-mono),ui-monospace,monospace;
+}
+.dark {
+  --bg:#100E0B; --surface:#191714; --surface-2:#22201C;
+  --border:#6D6861; --border-subtle:#302D29;
+  --text:#F6F3EF; --text-2:#AEAAA3;
+  --accent:#CFA354; --accent-hover:#E1B767; --on-accent:#100E0B;
+  --accent-text:#CFA354; --focus:#CFA354;
+  --success:#76CF8A; --warning:#F2985F; --danger:#F97770;
+  --turn:#CFA354; --confirmed:#76CF8A; --mempool:#7FBEF3; --due:#AEAAA3;
+}
+
+@theme inline {
+  --color-bg: var(--bg); --color-surface: var(--surface); --color-surface-2: var(--surface-2);
+  --color-border: var(--border); --color-border-subtle: var(--border-subtle);
+  --color-text: var(--text); --color-text-2: var(--text-2);
+  --color-accent: var(--accent); --color-accent-hover: var(--accent-hover); --color-on-accent: var(--on-accent);
+  --color-accent-text: var(--accent-text); --color-focus: var(--focus);
+  --color-success: var(--success); --color-warning: var(--warning); --color-danger: var(--danger);
+  --color-turn: var(--turn); --color-confirmed: var(--confirmed); --color-mempool: var(--mempool); --color-due: var(--due);
+  --font-sans: var(--font-sans); --font-mono: var(--font-mono);
+}
+
+html { background: var(--bg); color: var(--text); }
+body { background: var(--bg); color: var(--text); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
