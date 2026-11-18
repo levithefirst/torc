@@ -18,8 +18,8 @@ import { toTokenAddress, addressToLockingHex } from './address';
 export interface WalletSide {
   /** Spendable P2PKH UTXOs belonging to the signer (BCH and token UTXOs). */
   utxos: SpendableUtxo[];
-  /** Unlocks every wallet input. */
-  unlocker: Unlocker;
+  /** Unlocks wallet inputs: one unlocker for all, or one per UTXO (HD wallets span many addresses). */
+  unlocker: Unlocker | ((utxo: SpendableUtxo) => Unlocker);
   /** Signer's address (any form; converted to token-aware for token outputs). */
   address: string;
 }
@@ -62,12 +62,15 @@ function addBchFunding(tb: TransactionBuilder, wallet: WalletSide, need: bigint,
   for (const u of plainUtxos(wallet.utxos)) {
     if (have >= need) break;
     if (exclude.has(`${u.txid}:${u.vout}`)) continue;
-    tb.addInput(u, wallet.unlocker);
+    tb.addInput(u, unlockFor(wallet, u));
     exclude.add(`${u.txid}:${u.vout}`);
     have += u.satoshis;
   }
   if (have < need) throw new TorcError(`not enough BCH: need ${need} sats more, wallet has ${have}`);
 }
+
+export const unlockFor = (w: WalletSide, u: SpendableUtxo): Unlocker =>
+  typeof w.unlocker === 'function' ? w.unlocker(u) : w.unlocker;
 
 const sum = (xs: bigint[]) => xs.reduce((a, b) => a + b, 0n);
 
@@ -112,7 +115,7 @@ export function buildGenesis(opts: {
   const state: CircleState = { round: 0, roundStart: opts.startTime, paidMask: 0 };
 
   const tb = new TransactionBuilder({ provider });
-  tb.addInput(first, wallet.unlocker);
+  tb.addInput(first, unlockFor(wallet, first));
   const outputs: Output[] = [
     {
       to: contract.tokenAddress,
@@ -126,10 +129,39 @@ export function buildGenesis(opts: {
     })),
   ];
   tb.addOutputs(outputs);
+  // Self-describing genesis: the circle's constructor params in an OP_RETURN, so anyone can
+  // rebuild the covenant from the chain (and check it hashes to the address).
+  tb.addOpReturnOutput(encodeParamsOpReturn(params));
   const need = sum(outputs.map((o) => o.amount)) + FEE_HEADROOM - first.satoshis;
   if (need > 0n) addBchFunding(tb, wallet, need, new Set([`${first.txid}:${first.vout}`]));
   tb.addBchChangeOutputIfNeeded({ to: wallet.address, feeRate: FEE_RATE });
   return { builder: tb, params, contract, state };
+}
+
+export const OP_RETURN_TAG = 'TORC';
+
+export function encodeParamsOpReturn(p: CircleParams): string[] {
+  const n = (v: bigint | number, bytes: number) => {
+    const b = new Uint8Array(bytes);
+    let x = BigInt(v);
+    for (let i = 0; i < bytes; i++) { b[i] = Number(x & 0xffn); x >>= 8n; }
+    return '0x' + Array.from(b, (y) => y.toString(16).padStart(2, '0')).join('');
+  };
+  return [OP_RETURN_TAG, '0x01', p.mode === 'token' ? '0x01' : '0x00', '0x' + (p.mode === 'token' ? p.assetCategory! : '00'), n(p.contribution, 8), n(p.seats, 1), n(p.period, 4)];
+}
+
+/** Parse the genesis OP_RETURN chunks (as raw byte arrays) back into params. */
+export function decodeParamsOpReturn(chunks: Uint8Array[], circleCategory: string, network: CircleParams['network']): CircleParams | null {
+  const td = new TextDecoder();
+  if (chunks.length !== 7 || td.decode(chunks[0]) !== OP_RETURN_TAG || chunks[1]![0] !== 1) return null;
+  const le = (b: Uint8Array) => b.reduceRight((a, x) => (a << 8n) | BigInt(x), 0n);
+  const hex = (b: Uint8Array) => Array.from(b, (y) => y.toString(16).padStart(2, '0')).join('');
+  const mode = chunks[2]![0] === 1 ? 'token' : 'bch';
+  return {
+    network, mode, circleCategory,
+    assetCategory: mode === 'token' ? hex(chunks[3]!) : undefined,
+    contribution: le(chunks[4]!), seats: Number(le(chunks[5]!)), period: Number(le(chunks[6]!)),
+  };
 }
 
 // ---------------------------------------------------------------- contribute
@@ -152,7 +184,7 @@ export function buildContribute(opts: {
 
   const tb = new TransactionBuilder({ provider });
   tb.addInput(stateUtxo, contract.unlock.contribute!());
-  tb.addInput(memberNft, wallet.unlocker);
+  tb.addInput(memberNft, unlockFor(wallet, memberNft));
   const used = new Set([`${memberNft.txid}:${memberNft.vout}`]);
 
   const memberLock = hexToBin(memberNft.lockingBytecode);
@@ -175,7 +207,7 @@ export function buildContribute(opts: {
     let have = 0n;
     for (const u of ft) {
       if (have >= params.contribution) break;
-      tb.addInput(u, wallet.unlocker);
+      tb.addInput(u, unlockFor(wallet, u));
       used.add(`${u.txid}:${u.vout}`);
       have += u.token!.amount;
       inSats += u.satoshis;
@@ -220,7 +252,7 @@ export function buildClaim(opts: {
 
   const tb = new TransactionBuilder({ provider });
   tb.addInput(stateUtxo, contract.unlock.claim!());
-  tb.addInput(memberNft, wallet.unlocker);
+  tb.addInput(memberNft, unlockFor(wallet, memberNft));
   for (const c of contributions) tb.addInput(c, contract.unlock.pool!());
 
   const memberLock = hexToBin(memberNft.lockingBytecode);

@@ -20,6 +20,8 @@
     "@bitauth/libauth": "3.0.0",
     "@cashscript/utils": "0.14.0",
     "@electrum-cash/network": "4.4.8",
+    "@wizardconnect/dapp": "0.2.8",
+    "@wizardconnect/react": "0.2.7",
     "cashc": "0.14.0",
     "cashscript": "0.14.0",
     "geist": "1.9.2",
@@ -27,7 +29,8 @@
     "next": "16.4.6",
     "qrcode": "1.5.4",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "server-only": "0.0.1"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",

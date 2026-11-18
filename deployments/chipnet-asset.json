@@ -1,0 +1,9 @@
+{
+  "name": "tPUSD",
+  "symbol": "tPUSD",
+  "decimals": 2,
+  "category": "fb9175ea28b49f530d1e21d521f52c91cf52db90c07af4c5bffbb85fcbb725d4",
+  "genesisTxid": "8ebfcc8f0db4637d7deac2772ea7a3aee64038916c74ec810d42132e75051b21",
+  "distributionTxid": "394f40ae8f94abbf42bea52af70b764c0af051cdfe3f0360f582a0ce2fe0db5b",
+  "supply": "100000000"
+}
