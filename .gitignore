@@ -3,3 +3,12 @@
 !.env.example
 .secrets/
 node_modules/
+.next/
+out/
+coverage/
+test-results/
+playwright-report/
+*.tsbuildinfo
+.vercel
+next-env.d.ts
+.DS_Store

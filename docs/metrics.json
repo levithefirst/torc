@@ -1,0 +1,42 @@
+{
+  "token-3": {
+    "redeemScriptBytes": 486,
+    "opcount": 265,
+    "contributeTxBytes": 1312,
+    "contributeFeeSats": 1312,
+    "claimTxBytes": 2687,
+    "claimFeeSats": 2687,
+    "perRoundFeeSats": 6623,
+    "maxOpCost": 43950
+  },
+  "token-5": {
+    "redeemScriptBytes": 486,
+    "opcount": 265,
+    "contributeTxBytes": 1312,
+    "contributeFeeSats": 1312,
+    "claimTxBytes": 3753,
+    "claimFeeSats": 3753,
+    "perRoundFeeSats": 10313,
+    "maxOpCost": 44246
+  },
+  "bch-3": {
+    "redeemScriptBytes": 439,
+    "opcount": 255,
+    "contributeTxBytes": 1012,
+    "contributeFeeSats": 1012,
+    "claimTxBytes": 2460,
+    "claimFeeSats": 2460,
+    "perRoundFeeSats": 5496,
+    "maxOpCost": 42203
+  },
+  "bch-5": {
+    "redeemScriptBytes": 439,
+    "opcount": 255,
+    "contributeTxBytes": 1012,
+    "contributeFeeSats": 1012,
+    "claimTxBytes": 3432,
+    "claimFeeSats": 3432,
+    "perRoundFeeSats": 8492,
+    "maxOpCost": 42365
+  }
+}

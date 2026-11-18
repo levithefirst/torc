@@ -1,0 +1,33 @@
+{
+  "name": "torc",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "compile": "cashc contracts/TorcCircle.cash -o src/contracts/TorcCircle.json && cashc contracts/TorcCircleBch.cash -o src/contracts/TorcCircleBch.json",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "secret-scan": "scripts/secret-scan.sh --all",
+    "keys:new": "tsx scripts/keys-new.ts",
+    "faucet": "tsx scripts/faucet.ts",
+    "tpusd:mint": "tsx scripts/tpusd-mint.ts",
+    "circle:create": "tsx scripts/circle-create.ts",
+    "circle:tick": "tsx scripts/circle-tick.ts",
+    "circle:inspect": "tsx scripts/circle-inspect.ts",
+    "prepare": "[ -d .git ] && scripts/install-hooks.sh || true"
+  },
+  "dependencies": {
+    "@bitauth/libauth": "3.0.0",
+    "@cashscript/utils": "0.14.0",
+    "@electrum-cash/network": "4.4.8",
+    "cashc": "0.14.0",
+    "cashscript": "0.14.0",
+    "mainnet-js": "4.0.0-next.13"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "5.1.1"
+  }
+}

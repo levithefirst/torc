@@ -1,0 +1,148 @@
+pragma cashscript ^0.14.0;
+
+// Torc: a rotating savings circle (ajo / esusu) as one covenant.
+//
+// Three kinds of UTXO live at this covenant's address:
+//   1. The STATE NFT (circleCategory, mutable). Exactly one exists. Commitment:
+//        round (1 byte) | roundStart (4 bytes LE, unix seconds) | paidMask (1 byte)
+//   2. CONTRIBUTION UTXOs: exactly `contribution` satoshis, no tokens at all.
+//   3. Nothing else is expected; stray sends are inert.
+// MEMBER NFTs (circleCategory, immutable, commitment = seat byte + version byte) live in
+// members' own wallets. Whoever holds seat i's NFT IS seat i.
+//
+// BCH mode: the contribution is `contribution` satoshis (no fungible token). Token mode lives
+// in TorcCircle.cash; two small contracts beat one contract with a runtime mode flag.
+// Uses only BCH_2025_05 opcodes (no loops / shifts) so every wallet VM can evaluate it.
+contract TorcCircleBch(
+    bytes32 circleCategory,
+    int contribution,
+    int seats,
+    int period
+) {
+    // A member pays this round's contribution into the ring.
+    // tx: in0 = state, in1 = member NFT, in2.. = member's funding
+    //     out0 = state', out1 = contribution, out2 = member NFT back, out3.. = change
+    function contribute() {
+        // The state NFT must be the input being unlocked, at index 0.
+        require(this.activeInputIndex == 0, "state must be input 0");
+        // The covenant's own locking bytecode (P2SH32), read from the input being unlocked.
+        bytes ring = tx.inputs[0].lockingBytecode;
+        bytes stateCategory = circleCategory + 0x01;
+        // Input 0 is this circle's mutable state NFT (not a contribution UTXO).
+        require(tx.inputs[0].tokenCategory == stateCategory, "input 0 is not the state NFT");
+
+        // Input 1 is a member NFT of this circle (immutable, any holder).
+        require(tx.inputs[1].tokenCategory == circleCategory, "input 1 is not a member NFT");
+        int seat = int(tx.inputs[1].nftCommitment.split(1)[0]);
+        // The seat must exist in this circle.
+        require(seat < seats, "seat out of range");
+
+        bytes state = tx.inputs[0].nftCommitment;
+        int paidMask = int(state.split(5)[1]);
+        // bit = 2^seat, via a lookup table (no shift opcodes needed).
+        int bit = int(0x0102040810.split(seat)[1].split(1)[0]);
+        // A seat can pay only once per round.
+        require((paidMask / bit) % 2 == 0, "seat already paid this round");
+
+        // State goes back to this covenant, same category and capability (mutable),
+        // same sats, no fungible tokens. Consensus then forbids any other circleCategory NFT.
+        require(tx.outputs[0].lockingBytecode == ring, "state must stay in the ring");
+        require(tx.outputs[0].tokenCategory == stateCategory, "state must stay a mutable NFT");
+        require(tx.outputs[0].value == tx.inputs[0].value, "state sats must not change");
+        require(tx.outputs[0].tokenAmount == 0, "state carries no fungible tokens");
+        // round and roundStart unchanged; only this seat's bit is set.
+        require(tx.outputs[0].nftCommitment == state.split(5)[0] + toPaddedBytes(paidMask + bit, 1), "bad new state");
+
+        // Output 1: exactly one contribution, locked to this covenant, no NFT.
+        require(tx.outputs[1].lockingBytecode == ring, "contribution must go to the ring");
+        require(tx.outputs[1].tokenCategory == 0x, "contribution carries no tokens");
+        require(tx.outputs[1].value == contribution, "contribution amount is fixed");
+
+        // Output 2: the member NFT goes back to whoever spent it, unchanged.
+        require(tx.outputs[2].lockingBytecode == tx.inputs[1].lockingBytecode, "member NFT must return to its holder");
+        require(tx.outputs[2].tokenCategory == circleCategory, "member NFT must stay immutable");
+        require(tx.outputs[2].nftCommitment == tx.inputs[1].nftCommitment, "member NFT must be unchanged");
+    }
+
+    // The member whose turn it is takes the whole pot.
+    // tx: in0 = state, in1 = turn member NFT, in2..in(seats+1) = contributions (pool()),
+    //     in(seats+2).. = optional claimer funding
+    //     out0 = state', out1 = pot to turn member, out2 = member NFT back, out3.. = change
+    function claim() {
+        require(this.activeInputIndex == 0, "state must be input 0");
+        // The covenant's own locking bytecode (P2SH32), read from the input being unlocked.
+        bytes ring = tx.inputs[0].lockingBytecode;
+        bytes stateCategory = circleCategory + 0x01;
+        require(tx.inputs[0].tokenCategory == stateCategory, "input 0 is not the state NFT");
+        require(tx.inputs[1].tokenCategory == circleCategory, "input 1 is not a member NFT");
+
+        bytes state = tx.inputs[0].nftCommitment;
+        int round = int(state.split(1)[0] + 0x00);
+        int roundStart = int(state.split(1)[1].split(4)[0]);
+        int paidMask = int(state.split(5)[1]);
+
+        // Only the seat whose turn it is (round % seats) can claim.
+        int seat = int(tx.inputs[1].nftCommitment.split(1)[0]);
+        require(seat == round % seats, "not this seat's turn");
+        // Every seat must have paid: paidMask == 2^seats - 1.
+        int full = int(0x010204081020.split(seats)[1].split(1)[0]) - 1;
+        require(paidMask == full, "not every seat has paid");
+        // The round counter is one byte; the circle ends at round 255.
+        require(round < 255, "circle finished");
+        // At least `period` seconds since the last payout (timestamp locktime, checked
+        // by consensus against median-time-past, so it lags wall clock by about an hour).
+        require(tx.time >= roundStart + period, "payout not open yet");
+
+        // State advances: round + 1, roundStart = this tx's locktime, paidMask = 0.
+        require(tx.outputs[0].lockingBytecode == ring, "state must stay in the ring");
+        require(tx.outputs[0].tokenCategory == stateCategory, "state must stay a mutable NFT");
+        require(tx.outputs[0].value == tx.inputs[0].value, "state sats must not change");
+        require(tx.outputs[0].tokenAmount == 0, "state carries no fungible tokens");
+        bytes newRound = toPaddedBytes(round + 1, 2).split(1)[0];
+        require(tx.outputs[0].nftCommitment == newRound + toPaddedBytes(tx.locktime, 4) + 0x00, "bad new state");
+
+        // Inputs 2..seats+1 are exactly this round's contributions from this covenant.
+        require(tx.inputs.length >= seats + 2, "missing contributions");
+        require(tx.inputs[2].lockingBytecode == ring, "contribution not from the ring");
+        require(tx.inputs[2].tokenCategory == 0x, "contribution carries no tokens");
+        require(tx.inputs[2].value == contribution, "contribution wrong amount");
+        require(tx.inputs[3].lockingBytecode == ring, "contribution not from the ring");
+        require(tx.inputs[3].tokenCategory == 0x, "contribution carries no tokens");
+        require(tx.inputs[3].value == contribution, "contribution wrong amount");
+        require(tx.inputs[4].lockingBytecode == ring, "contribution not from the ring");
+        require(tx.inputs[4].tokenCategory == 0x, "contribution carries no tokens");
+        require(tx.inputs[4].value == contribution, "contribution wrong amount");
+        if (seats > 3) {
+            require(tx.inputs[5].lockingBytecode == ring, "contribution not from the ring");
+            require(tx.inputs[5].tokenCategory == 0x, "contribution carries no tokens");
+            require(tx.inputs[5].value == contribution, "contribution wrong amount");
+        }
+        if (seats > 4) {
+            require(tx.inputs[6].lockingBytecode == ring, "contribution not from the ring");
+            require(tx.inputs[6].tokenCategory == 0x, "contribution carries no tokens");
+            require(tx.inputs[6].value == contribution, "contribution wrong amount");
+        }
+
+        // Output 1: the whole pot, to the turn seat's holder and nobody else.
+        require(tx.outputs[1].lockingBytecode == tx.inputs[1].lockingBytecode, "pot must go to the turn seat");
+        require(tx.outputs[1].tokenCategory == 0x, "pot carries no tokens");
+        require(tx.outputs[1].value == contribution * seats, "pot must be the full pot");
+
+        // Output 2: the member NFT goes back unchanged.
+        require(tx.outputs[2].lockingBytecode == tx.inputs[1].lockingBytecode, "member NFT must return to its holder");
+        require(tx.outputs[2].tokenCategory == circleCategory, "member NFT must stay immutable");
+        require(tx.outputs[2].nftCommitment == tx.inputs[1].nftCommitment, "member NFT must be unchanged");
+    }
+
+    // Sidecar for contribution UTXOs. They can move only as inputs 2..seats+1 of a tx whose
+    // input 0 is this circle's state NFT and whose output 0 advances the round, i.e. a valid
+    // claim() (contribute() never changes the round). So pooled money only ever leaves via claim.
+    function pool() {
+        require(this.activeInputIndex >= 2, "pool inputs start at index 2");
+        require(this.activeInputIndex <= seats + 1, "too many pool inputs");
+        bytes ring = tx.inputs[this.activeInputIndex].lockingBytecode;
+        require(tx.inputs[0].lockingBytecode == ring, "input 0 must be this ring");
+        require(tx.inputs[0].tokenCategory == circleCategory + 0x01, "input 0 must be the state NFT");
+        require(tx.outputs[0].nftCommitment.split(1)[0] != tx.inputs[0].nftCommitment.split(1)[0], "pool only moves in a claim");
+    }
+}
