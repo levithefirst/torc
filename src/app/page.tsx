@@ -10,6 +10,10 @@ export const revalidate = 10;
 
 export default async function Home() {
   const r = DEMO ? await getSnapshot(DEMO.params) : { snap: null, stale: true };
+  // If the chain is unreachable during a background revalidation, throw: Next.js then keeps
+  // serving the last good page (with its "as of" time) instead of an empty one. The first
+  // render at build time never throws, so the page always exists.
+  if (DEMO && !r.snap && process.env.NEXT_PHASE !== 'phase-production-build') throw new Error('chain unreachable; keeping last good render');
   return (
     <>
       <section className="pb-5 pt-2 sm:py-6">

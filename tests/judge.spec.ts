@@ -125,3 +125,13 @@ test('6. /new builds an unsigned 3-seat genesis without a wallet (dry run)', asy
   await expect(r).toContainText(/covenant (bchtest|bitcoincash):r/);
   expect(errors).toEqual([]);
 });
+
+test('7. Electrum down: the page still renders the last known state, labelled', async ({ page }) => {
+  // Block every chain path the browser has: Electrum WSS and the server snapshot API.
+  await page.routeWebSocket(/.*/, (ws) => ws.close());
+  await page.route('**/api/circle**', (r) => r.fulfill({ status: 503, body: '{"error":"chain unavailable"}' }));
+  await page.goto('/');
+  await expect(page.getByTestId('ring')).toBeVisible({ timeout: 10_000 }); // server-rendered state
+  await expect(page.getByTestId('feed-row').first()).toBeVisible();
+  await expect(page.getByTestId('live-status')).toContainText(/as of .* · (reconnecting|connecting live feed)/, { timeout: 15_000 });
+});

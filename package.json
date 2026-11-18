@@ -15,7 +15,8 @@
     "circle:tick": "tsx scripts/circle-tick.ts",
     "circle:inspect": "tsx scripts/circle-inspect.ts",
     "prepare": "[ -d .git ] && scripts/install-hooks.sh || true",
-    "fund:seats": "tsx scripts/fund-seats.ts"
+    "fund:seats": "tsx scripts/fund-seats.ts",
+    "seat:transfer": "tsx scripts/seat-transfer.ts"
   },
   "dependencies": {
     "@bitauth/libauth": "3.0.0",
@@ -23,6 +24,8 @@
     "@electrum-cash/network": "4.4.8",
     "@wizardconnect/dapp": "0.2.8",
     "@wizardconnect/react": "0.2.7",
+    "@xo-cash/engine": "0.1.1-next.18029697917",
+    "@xo-cash/templates": "0.0.12",
     "cashc": "0.14.0",
     "cashscript": "0.14.0",
     "geist": "1.9.2",

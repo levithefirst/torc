@@ -20,7 +20,8 @@
   "seatKeys": [
     "ade",
     "bisi",
-    "chidi"
+    "chidi",
+    "dayo"
   ],
   "genesisTxid": "ed8fbac3c0077496dde57103d69d6ed8b165e97745b74093eaf4e54d90e49069",
   "assetName": "tPUSD",
@@ -79,6 +80,12 @@
       "seat": 1,
       "round": 1,
       "at": "2026-11-18T18:50:56.918Z"
+    },
+    {
+      "kind": "transfer",
+      "txid": "ed0ead843e5c1d0dd2b405407610314223eeac4a799a37533631a98161f87bc1",
+      "seat": 2,
+      "at": "2026-11-18T18:56:10.802Z"
     }
   ]
 }
