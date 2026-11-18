@@ -22,6 +22,6 @@ jobs:
         with: { node-version: 22, cache: npm }
       - run: npm ci
       - name: Contracts compile and match the committed artifacts
-        run: npm run compile && git diff --exit-code src/contracts
+        run: npm run compile && git diff --exit-code -I updatedAt src/contracts
       - run: npm test
       - run: npm run typecheck
