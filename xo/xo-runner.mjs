@@ -55,6 +55,12 @@ try {
     log('SEAT_ADDRESS', state.seatAddress);
   }
 
+  if (cmd === 'dump') {
+    const b = await engine.buildInvitationTransactionFromMergedCommit(process.argv[3]);
+    writeFileSync(join(dir, 'tx.hex'), b.serializedTransaction);
+    console.log('TXHEX ' + b.serializedTransaction);
+  }
+
   if (cmd === 'utxos') {
     const u = await engine.listUnspentOutputs();
     log('unspent outputs', u);
@@ -85,7 +91,7 @@ try {
     ];
     vars.push({ variableIdentifier: 'memberLockingScript', roleIdentifier: 'member', value: state.seatLock });
     inv = await engine.appendInvitation(id, { variables: vars });
-    inv = await engine.appendInvitation(id, { inputs: job.inputs.map((i) => ({ outpointTransactionHash: hexToBin(i.txid), outpointIndex: i.vout })) });
+    inv = await engine.appendInvitation(id, { inputs: job.inputs.map((i, k) => ({ inputIdentifier: ['stateInput', 'seatInput', 'paymentInput'][k], roleIdentifier: k === 0 ? 'circle' : 'member', outpointTransactionHash: hexToBin(i.txid), outpointIndex: i.vout })) });
     inv = await engine.appendInvitation(id, {
       outputs: [{ outputIdentifier: 'stateOutput' }, { outputIdentifier: 'contributionOutput' }, { outputIdentifier: 'seatReturnOutput' }, { outputIdentifier: 'paymentChangeOutput' }],
     });
