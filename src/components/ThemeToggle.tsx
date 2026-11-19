@@ -6,8 +6,11 @@ export function ThemeToggle() {
     try { localStorage.setItem('torc-theme', dark ? 'dark' : 'light'); } catch {}
   }
   return (
-    <button onClick={toggle} className="rounded border border-border px-2 py-0.5 text-[12px] hover:bg-surface-2" aria-label="Toggle light or dark theme">
-      Theme
+    <button onClick={toggle} className="grid size-9 place-items-center rounded-full text-text-2 hover:text-text" aria-label="Toggle light or dark theme" title="Theme">
+      <svg viewBox="0 0 20 20" className="size-[18px]" aria-hidden>
+        <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M10 3a7 7 0 0 1 0 14z" fill="currentColor" />
+      </svg>
     </button>
   );
 }
