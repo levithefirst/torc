@@ -173,7 +173,7 @@ src/lib/chain/        Electrum (WSS, failover; server side), HTTPS relay client 
 src/lib/wallet/       WizardConnect provider (HD discovery, inputPaths, sign + broadcast)
 src/app/              Next.js App Router: judge mode, /circle/[address], /new, /deck, API routes
 scripts/              keys:new, faucet, tpusd:mint, circle:create|tick|inspect, seat:transfer, fund:seats
-tests/contract/       Vitest + MockNetworkProvider: happy path, 14 attack cases, seat transfer, BCH mode, metrics (24 tests with tests/unit)
+tests/contract/       Vitest + MockNetworkProvider: happy path, 14 attack cases, seat transfer, BCH mode, metrics (27 tests with tests/unit)
 tests/judge.spec.ts   Playwright judge spec (mobile 360 + desktop) against BASE_URL
 xo/                   XO template, generator, engine runner
 docs/                 SDK-NOTES, DEPLOYMENTS, LATENCY, XO, HANDOFF, DECK, DEMO-SCRIPT, SUBMISSION, color theme
@@ -183,7 +183,7 @@ docs/                 SDK-NOTES, DEPLOYMENTS, LATENCY, XO, HANDOFF, DECK, DEMO-S
 
 ```bash
 npm install
-npm test                          # 24 tests: contracts (14 attack cases) + unit (no network)
+npm test                          # 27 tests: contracts (14 attack cases) + unit (no network)
 npm run dev                       # http://localhost:3000 (chipnet)
 BASE_URL=https://torc-cash.vercel.app npx playwright test
 NETWORK=chipnet npm run circle:inspect
