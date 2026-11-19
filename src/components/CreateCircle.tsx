@@ -2,7 +2,7 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MockNetworkProvider, randomUtxo, placeholderP2PKHUnlocker } from 'cashscript';
-import { WalletProvider, useWallet, ConnectButton } from '@/lib/wallet/WalletProvider';
+import { useWallet, ConnectButton } from '@/lib/wallet/WalletProvider';
 import { buildGenesis, buildPrepare, pickGenesisInput } from '@/lib/torc/txs';
 import { isValidAddress } from '@/lib/torc/address';
 import type { AssetMode } from '@/lib/torc/circle';
@@ -23,9 +23,7 @@ const PERIODS = [
 
 export function CreateCircle() {
   return (
-    <WalletProvider>
-      <Form />
-    </WalletProvider>
+    <Form />
   );
 }
 
@@ -82,8 +80,9 @@ function Form() {
         const prep = buildPrepare(w.provider, ws, 20_000n);
         await w.signAndSend(prep, 'Prepare a coin to start a savings circle');
         await new Promise((r) => setTimeout(r, 1500));
-        await w.rescan();
-        ws = w.walletSide()!;
+        // `w` is this render's snapshot, so read the fresh coins from rescan's return value.
+        const fresh = await w.rescan();
+        ws = { ...ws, utxos: fresh };
       }
       const { mtp } = await w.provider.medianTimePast();
       const g = buildGenesis({ provider: w.provider, params, wallet: ws, members: list, startTime: mtp });

@@ -5,6 +5,7 @@ import './globals.css';
 import { BRAND_NAME, TAGLINE } from '@/brand';
 import { Banner } from '@/components/Banner';
 import { Header } from '@/components/Header';
+import { WalletProvider } from '@/lib/wallet/WalletProvider';
 
 export const metadata: Metadata = {
   title: { default: `${BRAND_NAME}: rotating savings on Bitcoin Cash`, template: `%s · ${BRAND_NAME}` },
@@ -28,7 +29,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-dvh overflow-x-hidden">
         <Banner />
         <Header />
-        <main className="mx-auto max-w-5xl px-4 pb-16">{children}</main>
+        {/* One wallet session for the whole app, so it survives client navigation (e.g. /new -> /circle). */}
+        <WalletProvider>
+          <main className="mx-auto max-w-5xl px-4 pb-16">{children}</main>
+        </WalletProvider>
       </body>
     </html>
   );

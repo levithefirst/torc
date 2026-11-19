@@ -25,7 +25,8 @@ interface WalletCtx {
   addresses: HdAddress[];
   utxos: SpendableUtxo[];
   scanning: boolean;
-  rescan: () => Promise<void>;
+  /** Rescan the wallet's addresses; resolves with the fresh coin list. */
+  rescan: () => Promise<SpendableUtxo[]>;
   provider: TorcProvider;
   /** Wallet side for the tx builders (placeholder unlockers; the wallet signs later). */
   walletSide: () => WalletSide | null;
@@ -53,7 +54,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
   const rescan = useCallback(async () => {
     const m = wc.manager;
-    if (!m) return;
+    if (!m) return [];
     setScanning(true);
     try {
       const found: HdAddress[] = [];
@@ -73,7 +74,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       }
       const lists = await Promise.all(found.map((a) => provider.getUtxosForLockingBytecode(a.lockingHex).catch(() => [])));
       setAddresses(found);
-      setUtxos(lists.flat());
+      const all = lists.flat();
+      setUtxos(all);
+      return all;
     } finally {
       setScanning(false);
     }
@@ -122,7 +125,20 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     return txid;
   }, [wc.manager, byLock, provider, rescan]);
 
-  const connect = useCallback(() => { wc.connect(); setShowQr(true); }, [wc]);
+  // After a reload the hook auto-restores the stored session and sits in 'connecting' until the
+  // wallet answers; if the wallet dropped that session it never will, and wc.connect() is a no-op
+  // while connecting. So a click while connecting/reconnecting tears the session down and starts
+  // a fresh pairing once the hook is back to idle.
+  const [repair, setRepair] = useState(false);
+  const connect = useCallback(() => {
+    setShowQr(true);
+    if (wc.state === 'connecting' && wc.uri) return; // fresh pairing already waiting: just show the QR
+    if (wc.state === 'connecting' || wc.state === 'reconnecting') { setRepair(true); void wc.disconnect(); return; }
+    wc.connect();
+  }, [wc]);
+  useEffect(() => {
+    if (repair && wc.state === 'idle') { setRepair(false); wc.connect(); }
+  }, [repair, wc]);
 
   const value: WalletCtx = {
     state: wc.state, walletName: wc.walletName, error: wc.error, connect, disconnect: wc.disconnect,
@@ -159,7 +175,7 @@ export function ConnectButton() {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <button data-testid="connect-wallet" onClick={w.connect} className="rounded-[var(--radius)] bg-accent px-4 py-2 text-sm font-semibold text-on-accent hover:bg-accent-hover [html:not(.dark)_&]:border [html:not(.dark)_&]:border-text">
-        {w.state === 'connecting' ? 'Waiting for wallet…' : 'Connect wallet (WizardConnect)'}
+        {w.state === 'connecting' || w.state === 'reconnecting' ? 'Waiting for wallet… (tap to pair again)' : 'Connect wallet (WizardConnect)'}
       </button>
       {w.error && <span className="text-sm text-danger">{w.error}</span>}
     </div>

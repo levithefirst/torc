@@ -6,7 +6,6 @@ import { useLiveSnapshot } from '@/hooks/useLiveSnapshot';
 import { Ring } from './Ring';
 import { Feed } from './Feed';
 import { MemberPanel } from './MemberPanel';
-import { WalletProvider } from '@/lib/wallet/WalletProvider';
 import { assetInfo, fmtUnits } from '@/lib/app/demo';
 import { payoutLine } from './JudgeMode';
 
@@ -26,9 +25,7 @@ export function CircleView({ address, demo }: { address: string; demo?: { params
   if (err) return <p className="py-10 text-danger">{err}</p>;
   if (!loaded) return <p className="py-10 text-text-2">Reading this circle from the chain…</p>;
   return (
-    <WalletProvider>
-      <Inner paramsJson={loaded.paramsJson} initial={loaded.initial} names={demo?.names ?? []} name={demo?.name ?? 'Your circle'} />
-    </WalletProvider>
+    <Inner paramsJson={loaded.paramsJson} initial={loaded.initial} names={demo?.names ?? []} name={demo?.name ?? 'Your circle'} />
   );
 }
 
