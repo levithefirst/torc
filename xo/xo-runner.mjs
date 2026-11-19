@@ -7,9 +7,12 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { Engine, XO_SUPPORTED_NETWORKS } from '@xo-cash/engine';
 import { StorageType } from '@xo-cash/state';
+import { serializeInvitation } from '@xo-cash/utils';
+import { ElectrumWebSocket } from '@electrum-cash/web-socket';
+import { chipnet } from '@electrum-cash/checkpoint';
 import { generateBip39Mnemonic, hexToBin, binToHex, lockingBytecodeToCashAddress } from '@bitauth/libauth';
 
-const dir = join(homedir(), '.torc-xo');
+const dir = process.env.TORC_XO_DIR ?? join(homedir(), '.torc-xo');
 mkdirSync(dir, { recursive: true, mode: 0o700 });
 const mnemonicPath = join(dir, 'mnemonic');
 if (!existsSync(mnemonicPath)) writeFileSync(mnemonicPath, generateBip39Mnemonic(), { mode: 0o600 });
@@ -26,6 +29,9 @@ const engine = await Engine.create(readFileSync(mnemonicPath, 'utf8').trim(), {
   storageType: StorageType.INDEXEDDB,
   databasePath: dir,
   databaseFilename: 'torc-xo',
+  // XO_ELECTRUM_WS=host:port points the engine at a plain-ws Electrum endpoint, e.g. xo/electrum-relay-shim.mjs
+  // on hosts whose egress blocks Electrum WSS (:50004).
+  ...(process.env.XO_ELECTRUM_WS ? { electrumServers: [{ electrumSocket: new ElectrumWebSocket(process.env.XO_ELECTRUM_WS.split(':')[0], { port: Number(process.env.XO_ELECTRUM_WS.split(':')[1]), encrypted: false }), blockchain: chipnet }] } : {}),
 });
 try {
   const template = readFileSync(new URL('./torc-contribute.template.json', import.meta.url), 'utf8');
@@ -61,6 +67,39 @@ try {
     console.log('TXHEX ' + b.serializedTransaction);
   }
 
+  if (cmd === 'track') {
+    // resolveInvitationOutputLockingBytecode only compiles; adding the output to the receiveSeat invitation
+    // stores and subscribes the script hash so the engine tracks (and can later sign for) the seat's UTXOs.
+    const inv = await engine.appendInvitation(state.receiveInvitation, { outputs: [{ outputIdentifier: 'seatReceiveOutput', roleIdentifier: 'member' }] });
+    log('receive invitation outputs', (inv.invitation ?? inv).commits?.at(-1));
+  }
+
+  if (cmd === 'release') {
+    // Archiving an invitation releases the UTXOs it reserved (failed attempts keep them reserved otherwise).
+    for (const x of await engine.listInvitations()) {
+      const inv = x.invitation ?? x;
+      if (inv.invitationIdentifier !== state.receiveInvitation && inv.actionIdentifier === 'contribute') {
+        await engine.archiveInvitation(inv.invitationIdentifier);
+        log('archived', inv.invitationIdentifier);
+      }
+    }
+  }
+
+  if (cmd === 'export') {
+    // Invitation JSON as XO wallets share it (blaze.xo.cash: Invitations > Import). Public data only: commits,
+    // variables, outpoints, signatures, entity xpubs. No private keys.
+    const id = process.argv[3] ?? state.lastInvitation;
+    const x = await engine.getInvitation(id);
+    const out = process.argv[4] ?? `xo/runs/${id}.invitation.json`;
+    mkdirSync(join(out, '..'), { recursive: true });
+    writeFileSync(out, serializeInvitation(x.invitation ?? x) + '\n');
+    log('exported', out);
+  }
+
+  if (cmd === 'scripthashes') {
+    log('script hashes', await engine.listScriptHashes());
+  }
+
   if (cmd === 'utxos') {
     const u = await engine.listUnspentOutputs();
     log('unspent outputs', u);
@@ -91,16 +130,28 @@ try {
     ];
     vars.push({ variableIdentifier: 'memberLockingScript', roleIdentifier: 'member', value: state.seatLock });
     inv = await engine.appendInvitation(id, { variables: vars });
-    inv = await engine.appendInvitation(id, { inputs: job.inputs.map((i, k) => ({ inputIdentifier: ['stateInput', 'seatInput', 'paymentInput'][k], roleIdentifier: k === 0 ? 'circle' : 'member', outpointTransactionHash: hexToBin(i.txid), outpointIndex: i.vout })) });
+    inv = await engine.appendInvitation(id, {
+      inputs: job.inputs.map((i, k) => ({
+        inputIdentifier: ['stateInput', 'seatInput', 'paymentInput'][k], roleIdentifier: k === 0 ? 'circle' : 'member',
+        outpointTransactionHash: hexToBin(i.txid), outpointIndex: i.vout,
+        // The covenant input is not this wallet's, so the engine will not compile it; the circle role supplies it.
+        ...(k === 0 && job.stateUnlockingBytecode ? { unlockingBytecode: hexToBin(job.stateUnlockingBytecode) } : {}),
+      })),
+    });
     inv = await engine.appendInvitation(id, {
       outputs: [{ outputIdentifier: 'stateOutput' }, { outputIdentifier: 'contributionOutput' }, { outputIdentifier: 'seatReturnOutput' }, { outputIdentifier: 'paymentChangeOutput' }],
     });
     inv = await engine.appendInvitation(id, { transactionLocktime: 0, transactionVersion: 2 });
     log('missing requirements', await engine.listMissingRequirements(id));
-    for (const idx of await engine.listOwnInputIndexes(id).catch(() => [])) {
-      try { inv = await engine.signInvitation(id, idx); } catch (e) { log(`sign ${idx}`, String(e?.message ?? e)); }
+    const own = await engine.listOwnInputIndexes(id);
+    log('own input indexes', own);
+    for (const idx of own) {
+      try { inv = await engine.signInvitation(id, idx); log(`signed ${idx}`, 'ok'); } catch (e) { log(`sign ${idx}`, String(e?.stack ?? e)); }
     }
-    try { inv = await engine.signInvitation(id); } catch (e) { log('sign all', String(e?.message ?? e)); }
+    log('missing after signing', await engine.listMissingRequirements(id));
+    const built = await engine.buildInvitationTransactionFromMergedCommit(id).catch((e) => ({ error: String(e) }));
+    if (built.serializedTransaction) { writeFileSync(join(dir, 'tx.hex'), built.serializedTransaction); log('TXHEX', built.serializedTransaction); } else log('build', built);
+    if (process.env.XO_DRY_RUN) process.exit(0);
     const result = await engine.executeAction(id, { broadcastTransaction: true });
     log('EXECUTE_RESULT', result);
     state.lastInvitation = id;
