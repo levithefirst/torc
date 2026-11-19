@@ -52,7 +52,8 @@ type TickState =
   | { s: 'wait'; until: number; msg: string }
   | { s: 'error'; msg: string };
 
-export function JudgeMode({ initial, paramsJson, names, circleName, stale, events }: {
+export function JudgeMode({ initial, paramsJson, names, circleName, stale, events, intro }: {
+  intro?: React.ReactNode;
   initial: Snapshot | null;
   paramsJson: CircleParamsJson;
   names: string[];
@@ -105,85 +106,132 @@ export function JudgeMode({ initial, paramsJson, names, circleName, stale, event
   const lastClaim = snap?.feed.find((f) => f.kind === 'claim');
   const payout = t.s === 'done' && t.kind === 'claim' ? { seat: t.seat, txid: t.txid, amount: t.amount, fresh: true } : lastClaim ? { seat: lastClaim.seat, txid: lastClaim.txid, amount: lastClaim.amount ?? potTotal.toString(), fresh: false } : null;
 
+  const seats = snap?.params.seats ?? params.seats;
+  const paidCount = snap?.paid ?? 0;
+  const cta = t.s === 'running' ? 'Broadcasting…' : claimDue && snap ? `Run the next step live: pay ${seatName(names, snap.turnSeat)} the pot` : 'Run the next step live';
+
   return (
-    <section className="grid gap-8 md:grid-cols-[minmax(0,360px)_minmax(0,1fr)]" data-testid="judge-mode">
-      <div>
-        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-lg font-semibold">{circleName}</h2>
-          <StatusPill status={status} asOf={snap?.asOf} stale={stale && status !== 'live' && snap === initial} now={now} />
-        </div>
-        {snap ? <Ring snap={snap} names={names} key={prevTurn} /> : <p className="py-16 text-center text-text-2">Reaching the chain…</p>}
-      </div>
+    <section data-testid="judge-mode">
+      <div className="grid items-start gap-x-14 gap-y-8 lg:grid-cols-12">
+        {intro && <div className="lg:col-span-7 lg:col-start-1 lg:row-start-1">{intro}</div>}
 
-      <div className="min-w-0">
-        {snap && (
-          <div className="rounded-[var(--radius)] border border-border-subtle bg-surface p-4">
-            <p className="text-[15px]" data-testid="pot">
-              <span className="num text-xl font-semibold" data-testid="pot-amount">{fmtUnits(snap.potUnits, asset)}</span>{' '}
-              <span className="text-text-2">in the ring ·</span> <span className="num">{snap.paid} of {snap.params.seats}</span>{' '}
-              <span className="text-text-2">paid ·</span> <span>{payoutLine(snap, now ?? snap.asOf)}</span>
-            </p>
-            <p className="mt-1 text-sm text-text-2" data-testid="turn-label">
-              Round {snap.state.round + 1} · pays <span className="font-medium text-text">{seatName(names, snap.turnSeat)}</span> next · {fmtUnits(BigInt(snap.params.contribution) * BigInt(snap.params.seats), asset)} pot
-            </p>
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <button
-                data-testid="run-next"
-                onClick={runNext}
-                disabled={t.s === 'running' || waitLeft > 0}
-                className="rounded-[var(--radius)] bg-accent px-4 py-2.5 text-sm font-semibold text-on-accent hover:bg-accent-hover disabled:opacity-60 [html:not(.dark)_&]:border [html:not(.dark)_&]:border-text"
-              >
-                {t.s === 'running' ? 'Broadcasting…' : claimDue && snap ? `Run the next step live: pay ${seatName(names, snap.turnSeat)} the pot` : 'Run the next step live'}
-              </button>
-              <span className="text-[13px] text-text-2" data-testid="run-result" aria-live="polite">
-                {t.s === 'done' && (
-                  <>
-                    {t.msg} · broadcast in <span className="num">{(t.ms / 1000).toFixed(1)} s</span> · <TxLink txid={t.txid} />
-                  </>
-                )}
-                {t.s === 'wait' && <span data-testid="run-wait">{waitLeft > 0 ? `Next step available in ${waitLeft} s` : t.msg}</span>}
-                {t.s === 'error' && <span className="text-danger">{t.msg}</span>}
-                {t.s === 'idle' && 'Signs with a demo seat key on the server. No wallet needed.'}
-              </span>
-            </div>
-            {payout && (
-              <div
-                data-testid="payout"
-                data-fresh={payout.fresh ? '1' : '0'}
-                className={`mt-4 rounded-[var(--radius)] border p-3 text-sm ${payout.fresh ? 'border-confirmed bg-confirmed/10' : 'border-border-subtle'}`}
-              >
-                <span className="font-semibold">{seatName(names, payout.seat)} received {fmtUnits(payout.amount, asset)}</span>
-                <span className="text-text-2"> {payout.fresh ? 'just now: the whole pot, paid by the covenant to the turn seat' : '· the latest payout: the whole pot, paid by the covenant to the turn seat'} · </span>
-                <TxLink txid={payout.txid} label={`tx ${shortTx(payout.txid)}`} />
-              </div>
-            )}
-            <p className="mt-3 text-[13px]">
-              <Link href="/circle/demo" data-testid="open-circle" className="font-medium text-accent-text underline-offset-2 hover:underline">Open this circle →</Link>
-              <span className="text-text-2"> its own page, with the seat panel for wallet holders</span>
-            </p>
+        <div className="fade-up lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1 lg:pt-2" style={{ ['--d' as string]: '120ms' }}>
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b rule pb-3">
+            <h2 className="text-[15px] font-semibold tracking-tight">{circleName}</h2>
+            <StatusPill status={status} asOf={snap?.asOf} stale={stale && status !== 'live' && snap === initial} now={now} />
           </div>
-        )}
+          {snap ? <Ring snap={snap} names={names} key={prevTurn} /> : <p className="py-24 text-center text-text-2">Reaching the chain…</p>}
+        </div>
 
-        <h3 className="mb-1 mt-6 text-sm font-semibold uppercase tracking-wide text-text-2">On-chain activity</h3>
-        {snap ? <Feed rows={snap.feed} names={names} asset={asset} highlight={t.s === 'done' ? t.txid : undefined} total={snap.historyCount} address={snap.address} /> : <p className="text-sm text-text-2">Waiting for the chain…</p>}
+        <div className="min-w-0 lg:col-span-7 lg:col-start-1 lg:row-start-2">
+          {snap && (
+            <div className="fade-up rounded-[20px] border rule bg-surface" style={{ ['--d' as string]: '220ms' }}>
+              <div className="grid gap-5 p-5 sm:p-7">
+                <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4" data-testid="pot">
+                  <div>
+                    <div className="eyebrow mb-2">In the ring</div>
+                    <div className="num text-[clamp(40px,7vw,64px)] font-medium leading-none tracking-[-0.04em]" data-testid="pot-amount">{fmtUnits(snap.potUnits, asset)}</div>
+                  </div>
+                  <div className="min-w-[150px]">
+                    <div className="mb-2 flex gap-1" aria-hidden>
+                      {Array.from({ length: seats }, (_, i) => (
+                        <span key={i} className={`h-1.5 flex-1 rounded-full ${i < paidCount ? 'bg-confirmed' : 'bg-line'}`} />
+                      ))}
+                    </div>
+                    <div className="num text-[13px]"><span className="text-text">{snap.paid} of {snap.params.seats}</span> <span className="text-text-2">paid</span></div>
+                  </div>
+                </div>
+                <div className="grid gap-1 border-t rule pt-4 text-[14px]">
+                  <p>{payoutLine(snap, now ?? snap.asOf)}</p>
+                  <p className="text-text-2" data-testid="turn-label">
+                    Round {snap.state.round + 1} · pays <span className="font-medium text-text">{seatName(names, snap.turnSeat)}</span> next · <span className="num">{fmtUnits(potTotal, asset)}</span> pot
+                  </p>
+                </div>
+                <div className="grid gap-2.5">
+                  <button
+                    data-testid="run-next"
+                    onClick={runNext}
+                    disabled={t.s === 'running' || waitLeft > 0}
+                    className="btn btn-gold group w-full px-6 py-4 text-[15px] disabled:opacity-60 sm:w-auto sm:justify-self-start"
+                  >
+                    {t.s === 'running' && <span aria-hidden className="size-3.5 animate-spin rounded-full border-2 border-on-accent border-t-transparent" />}
+                    {cta}
+                    {t.s !== 'running' && <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>}
+                  </button>
+                  <span className="text-[13px] text-text-2" data-testid="run-result" aria-live="polite">
+                    {t.s === 'done' && (
+                      <>
+                        <span className="text-text">{t.msg}</span> · broadcast in <span className="num text-text">{(t.ms / 1000).toFixed(1)} s</span> · <TxLink txid={t.txid} />
+                      </>
+                    )}
+                    {t.s === 'wait' && <span data-testid="run-wait">{waitLeft > 0 ? `Next step available in ${waitLeft} s` : t.msg}</span>}
+                    {t.s === 'error' && <span className="text-danger">{t.msg}</span>}
+                    {t.s === 'idle' && 'A real transaction on chain, signed with a demo seat key on the server. No wallet needed.'}
+                  </span>
+                </div>
+              </div>
+              {payout ? (
+                <div
+                  data-testid="payout"
+                  data-fresh={payout.fresh ? '1' : '0'}
+                  key={payout.txid}
+                  className={`land border-t p-5 sm:px-7 ${payout.fresh ? 'border-confirmed bg-confirmed/10' : 'rule'}`}
+                >
+                  <div className="eyebrow mb-1.5">{payout.fresh ? 'Paid out just now' : 'Latest payout'}</div>
+                  <p className="text-[clamp(20px,3vw,26px)] font-medium leading-tight tracking-[-0.02em]">
+                    <span className="serif italic">{seatName(names, payout.seat)}</span> received <span className="num">{fmtUnits(payout.amount, asset)}</span>
+                  </p>
+                  <p className="mt-1.5 text-[13px] text-text-2">
+                    The whole pot, paid by the covenant to the turn seat · <TxLink txid={payout.txid} label={`tx ${shortTx(payout.txid)}`} />
+                  </p>
+                </div>
+              ) : (
+                <div className="border-t border-dashed rule p-5 sm:px-7" data-testid="payout-pending">
+                  <div className="eyebrow mb-1.5">Next payout</div>
+                  <p className="text-[15px] text-text-2">
+                    <span className="serif text-[20px] italic text-text">{seatName(names, snap.turnSeat)}</span> receives <span className="num text-text">{fmtUnits(potTotal, asset)}</span> once all {seats} seats have paid and the round time has passed. Nobody else can take it.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+          <p className="mt-4 text-[13px]">
+            <Link href="/circle/demo" data-testid="open-circle" className="link font-medium">Open this circle →</Link>
+            <span className="text-text-2"> its own page, with the seat panel for wallet holders</span>
+          </p>
+        </div>
       </div>
 
-      <ol className="grid gap-3 text-sm md:col-span-2 md:grid-cols-3" data-testid="how-it-works">
-        {[
-          { n: 1, title: 'Start a circle', body: 'One transaction mints a state NFT into the covenant and one member NFT per seat.', fn: 'genesis', line: 1, txid: showcase.genesis },
-          { n: 2, title: 'Everyone pays in', body: 'contribute() sets your seat’s bit and locks exactly one contribution in the ring.', fn: 'contribute()', line: 25, txid: showcase.contribute },
-          { n: 3, title: 'The turn seat takes the pot', body: 'claim() pays the whole pot to the holder of the turn seat’s NFT, and nobody else.', fn: 'claim()', line: contract.claim, txid: showcase.claim },
-        ].map((s) => (
-          <li key={s.n} className="rounded-[var(--radius)] border border-border-subtle p-3">
-            <div className="font-semibold">{s.n}. {s.title}</div>
-            <p className="mt-1 text-text-2">{s.body}</p>
-            <div className="mt-2 flex flex-wrap gap-x-3 text-[12px]">
-              <a className="text-accent-text underline-offset-2 hover:underline" href={contractUrl(contract.file, s.line)}>{s.fn} in {contract.file}</a>
-              {s.txid && <TxLink txid={s.txid} label={`tx ${shortTx(s.txid)}`} className="num text-accent-text underline-offset-2 hover:underline" />}
-            </div>
-          </li>
-        ))}
-      </ol>
+      <div className="mt-20 grid gap-x-14 gap-y-12 border-t rule pt-10 lg:grid-cols-12">
+        <div className="min-w-0 lg:col-span-7">
+          <h3 className="eyebrow mb-3">On-chain activity</h3>
+          {snap ? <Feed rows={snap.feed} names={names} asset={asset} highlight={t.s === 'done' ? t.txid : undefined} total={snap.historyCount} address={snap.address} /> : <p className="text-sm text-text-2">Waiting for the chain…</p>}
+        </div>
+
+        <div className="lg:col-span-5">
+          <h3 className="eyebrow mb-5">The covenant, in three calls</h3>
+          <ol className="relative grid gap-8 text-sm" data-testid="how-it-works">
+            <span aria-hidden className="absolute bottom-3 left-[15px] top-3 w-px bg-line" />
+            {[
+              { n: 1, title: 'Start a circle', body: 'One transaction mints a state NFT into the covenant and one member NFT per seat.', fn: 'genesis', line: 1, txid: showcase.genesis },
+              { n: 2, title: 'Everyone pays in', body: 'contribute() sets your seat’s bit and locks exactly one contribution in the ring.', fn: 'contribute()', line: 25, txid: showcase.contribute },
+              { n: 3, title: 'The turn seat takes the pot', body: 'claim() pays the whole pot to the holder of the turn seat’s NFT, and nobody else.', fn: 'claim()', line: contract.claim, txid: showcase.claim },
+            ].map((s) => (
+              <li key={s.n} className="relative grid grid-cols-[32px_minmax(0,1fr)] gap-4">
+                <span className={`num relative z-10 grid size-8 place-items-center rounded-full border bg-bg text-[12px] ${s.n === 3 ? 'border-turn text-turn' : 'rule text-text-2'}`}>{s.n}</span>
+                <div className="min-w-0 pt-1">
+                  <div className="text-[16px] font-semibold tracking-tight">{s.title}</div>
+                  <p className="mt-1 text-text-2">{s.body}</p>
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px]">
+                    <a className="num link" href={contractUrl(contract.file, s.line)}>{s.fn} in {contract.file}</a>
+                    {s.txid && <TxLink txid={s.txid} label={`tx ${shortTx(s.txid)}`} className="num link" />}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
     </section>
   );
 }

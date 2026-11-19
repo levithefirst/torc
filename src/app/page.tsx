@@ -16,22 +16,71 @@ export default async function Home() {
   // serving the last good page (with its "as of" time) instead of an empty one. The first
   // render at build time never throws, so the page always exists.
   if (DEMO && !r.snap && process.env.NEXT_PHASE !== 'phase-production-build') throw new Error('chain unreachable; keeping last good render');
+  const net = NETWORK === 'mainnet' ? 'BCH mainnet' : NETWORK;
+  const intro = (
+    <div className="pt-4 sm:pt-10">
+      <p className="eyebrow fade-up mb-5 flex items-center gap-2">
+        <span aria-hidden className="inline-block h-px w-6 bg-accent" /> Savings circles on Bitcoin Cash
+      </p>
+      <h1 className="display reveal" aria-label="Nobody holds the pot.">
+        <span><span><em className="serif pr-[0.04em] font-normal italic tracking-[-0.02em]">Nobody</em> holds</span></span>
+        <span><span>the pot.</span></span>
+      </h1>
+      <p className="fade-up mt-6 max-w-[34rem] text-[17px] leading-relaxed text-text-2 sm:text-[19px]" style={{ ['--d' as string]: '200ms' }}>
+        {PITCH}
+      </p>
+      <p className="fade-up mt-4 hidden max-w-[34rem] text-[14px] leading-relaxed text-text-2 sm:block" style={{ ['--d' as string]: '260ms' }}>
+        Below is a real circle on {net}, read live from the chain through {BRAND_NAME}’s server relay. Its rounds are 10 minutes long so you can watch a whole cycle; real circles use a day or a week.
+      </p>
+    </div>
+  );
   return (
     <>
-      <section className="pb-5 pt-2 sm:py-6">
-        <h1 className="max-w-2xl text-lg font-semibold leading-snug tracking-tight sm:text-3xl">{PITCH}</h1>
-        <p className="mt-2 hidden max-w-2xl text-text-2 sm:block">
-          Rotating savings circles are a global habit: tandas in Mexico, hui in China, chit funds in India, susu in Ghana, ajo and esusu in Nigeria, where {BRAND_NAME} started. {BRAND_NAME} puts one on Bitcoin Cash. Each member pays a fixed amount every round and a covenant pays the
-          whole pot to the member whose turn it is. Below is a real circle on {NETWORK === 'mainnet' ? 'BCH mainnet' : NETWORK}, read live from the chain through {BRAND_NAME}’s server relay. Its rounds are 10 minutes long so you can watch a whole cycle; real circles use a day or a week.{' '}
-          <Link href="/new" className="text-accent-text underline underline-offset-2">Start your own</Link>.
+      {DEMO ? (
+        <JudgeMode intro={intro} initial={r.snap} stale={r.stale} paramsJson={DEMO.paramsJson} names={DEMO.seatNames} circleName={DEMO.name} events={DEMO.events} />
+      ) : (
+        <>
+          {intro}
+          <p className="mt-8 text-text-2">No demo circle is configured for this network yet.</p>
+        </>
+      )}
+      <p className="mt-6 text-[13px] text-text-2 sm:hidden">
+        A real circle on {net}, read live through {BRAND_NAME}’s server relay. Its rounds are 10 minutes long so you can watch a whole cycle; real circles use a day or a week.
+      </p>
+
+      <section className="mt-24 border-t rule pt-10" aria-labelledby="habit">
+        <h2 id="habit" className="max-w-3xl text-[clamp(28px,4.4vw,52px)] font-semibold leading-[1.02] tracking-[-0.035em]">
+          Rotating savings circles are a <span className="serif font-normal italic">global habit.</span>
+        </h2>
+        <ul className="mt-10 grid grid-cols-2 border-l border-t rule sm:grid-cols-3 lg:grid-cols-6">
+          {[
+            ['tandas', 'Mexico'], ['hui', 'China'], ['chit funds', 'India'], ['susu', 'Ghana'], ['ajo', 'Nigeria'], ['esusu', 'Nigeria'],
+          ].map(([name, where]) => (
+            <li key={name} className="border-b border-r rule px-4 py-5">
+              <div className="serif text-[clamp(26px,3vw,36px)] italic leading-none">{name}</div>
+              <div className="eyebrow mt-3 !text-[10px]">{where}</div>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-8 max-w-2xl text-[15px] leading-relaxed text-text-2">
+          Ajo and esusu in Nigeria is where {BRAND_NAME} started. Each member pays a fixed amount every round and a covenant pays the whole pot to the member whose turn it is. {BRAND_NAME} puts that circle on Bitcoin Cash.
         </p>
       </section>
-      {DEMO ? (
-        <JudgeMode initial={r.snap} stale={r.stale} paramsJson={DEMO.paramsJson} names={DEMO.seatNames} circleName={DEMO.name} events={DEMO.events} />
-      ) : (
-        <p className="text-text-2">No demo circle is configured for this network yet.</p>
-      )}
+
       <NoPay />
+
+      <section className="mt-24 grid items-end gap-8 rounded-[24px] border rule bg-surface p-7 sm:p-12 lg:grid-cols-[1fr_auto]">
+        <div>
+          <h2 className="text-[clamp(32px,5vw,60px)] font-semibold leading-[0.98] tracking-[-0.04em]">
+            Start your own <span className="serif font-normal italic">circle.</span>
+          </h2>
+          <p className="mt-4 max-w-xl text-text-2">3 to 5 members, a fixed amount, a fixed round length. Nothing can be changed after creation, and there is no admin key.</p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/new" className="btn btn-gold px-6 py-3.5 text-[15px]">Start a circle →</Link>
+          <Link href="/deck" className="btn btn-ghost px-6 py-3.5 text-[15px]">Read the deck</Link>
+        </div>
+      </section>
     </>
   );
 }
