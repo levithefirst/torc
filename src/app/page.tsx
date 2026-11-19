@@ -3,9 +3,11 @@ import { getSnapshot } from '@/lib/server/chain';
 import { JudgeMode } from '@/components/JudgeMode';
 import { PITCH, BRAND_NAME } from '@/brand';
 import Link from 'next/link';
+import { NETWORK } from '@/lib/chain/config';
+import { NoPay } from '@/components/NoPay';
 
 // Rendered on the server from the chain (5 s timeout, last-known fallback), refreshed every 10 s,
-// then hydrated and kept live in the browser over Electrum WebSocket.
+// then hydrated and kept live in the browser by polling the server's chain relay every 4 s.
 export const revalidate = 10;
 
 export default async function Home() {
@@ -20,7 +22,7 @@ export default async function Home() {
         <h1 className="max-w-2xl text-lg font-semibold leading-snug tracking-tight sm:text-3xl">{PITCH}</h1>
         <p className="mt-2 hidden max-w-2xl text-text-2 sm:block">
           {BRAND_NAME} is an ajo / esusu savings circle on Bitcoin Cash. Each member pays a fixed amount every round and a covenant pays the
-          whole pot to the member whose turn it is. Below is a real circle, read straight from the chain.{' '}
+          whole pot to the member whose turn it is. Below is a real circle on {NETWORK}, read live from the chain through {BRAND_NAME}’s server relay. Its rounds are 10 minutes long so you can watch a whole cycle; real circles use a day or a week.{' '}
           <Link href="/new" className="text-accent-text underline underline-offset-2">Start your own</Link>.
         </p>
       </section>
@@ -29,6 +31,7 @@ export default async function Home() {
       ) : (
         <p className="text-text-2">No demo circle is configured for this network yet.</p>
       )}
+      <NoPay />
     </>
   );
 }

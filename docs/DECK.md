@@ -1,8 +1,7 @@
-# Deck outline (Widget Factory template, 8 slides)
+# Torc deck (8 slides)
 
-The bot copies the Widget Factory Google Slides template
-(docs.google.com/presentation/d/1Yfuk9CJkf4U9M_WukcELhumWgj3Ak6345Ewy8hSp-Hk) and fills it slide by slide.
-Colours: ink #100E0B background, Torc Gold #CFA354 only for the turn seat / one highlight per slide.
+The live web deck is at https://torc-cash.vercel.app/deck (source: `src/app/deck/page.tsx`; its numbers come
+from `docs/metrics.json`, `docs/LATENCY.md` and the demo circle on chain). This file is the plain-text outline.
 
 ## 1. Problem
 - Rotating savings circles (ajo, esusu, tanda, susu, chit funds) are used across West Africa, the Caribbean, Latin America and South Asia.
@@ -21,21 +20,27 @@ Colours: ink #100E0B background, Torc Gold #CFA354 only for the turn seat / one 
 ## 4. How the covenant works
 - State NFT in the covenant: round, round start, paid bitmask. Member NFT per seat: whoever holds it is that seat.
 - contribute(): sets your bit, locks exactly one contribution. claim(): everyone paid + period passed → whole pot to the turn seat's own address.
-- No admin key, no upgrade path, parameters fixed at creation. 22 tests including 12 attack cases.
+- No admin key, no upgrade path, parameters fixed at creation. 24 tests, 14 of them attack cases the covenant must reject.
 
 ## 5. Why Bitcoin Cash
 - Native tokens (CashTokens) for seats, state and the dollar (PUSD): no bridges, no wrapped assets.
 - ~$0.003 per contribution, ~$0.014 per full 3-seat round (BCH $208.25, 18 Nov 2026).
 - 0-conf: payments are visible in ~2 seconds, which is what a market trader needs to trust it.
 
-## 6. Business model
+## 6. If someone doesn't pay
+- Today: the payout needs every seat paid, so a missing payment pauses the round; nobody can take the pot early. Paid-in money stays locked until the missing seat pays (no deadline). A seat NFT can be handed on.
+- Not solved in v1: a seat that never pays leaves that round's money stuck; a member who took the pot can stop paying.
+- v2: timeout refund (each payer reclaims their own contribution after deadline + grace), a per-seat bond forfeited to the members who paid, and a payout bond holding back what a member still owes.
+
+## 7. What runs today (chipnet)
+- 4 circles; 8+ payouts made by covenants (the demo circle keeps adding more); a seat transferred and paid in by its new holder; a contribution through the XO engine.
+- Real-wallet test (Paytaca extension, 19 Nov 2026): create + all 3 seats paid (txids in README "Wallets").
+- Median time to a live circle on screen 1,183 ms; click to SEEN 0-conf 2,406 ms (docs/LATENCY.md).
+
+## 8. Business model and ask
 - Free core protocol. Revenue from: a small per-circle creation fee in the app; premium circles (reminders, larger circles, bond NFTs against default); white-label for cooperatives, church and market associations, and diaspora remittance circles.
 - Distribution: existing ajo groups move as a whole circle at once (3–5 users per acquisition).
 
-## 7. Traction from the event (fill with live numbers)
-- Chipnet: 3 circles, ≥ 2 full rounds, a seat transfer, an XO-engine contribution. Txids: genesis, contribution (SEEN → CONFIRMED), claim (see docs/DEPLOYMENTS.md and docs/SUBMISSION.md).
-- Judge spec green on production at 360 px and desktop; median time-to-state and time-to-0-conf from docs/LATENCY.md.
-
-## 8. Team + ask
+## Team + ask (on the business slide)
 - Fluid (builder). Built during BCH BLAZE 2026, 18–22 Nov.
 - Ask: Mainnet Track + Build with XO; pilot with one Lagos market circle in PUSD; intros to wallet teams (Selene, Paytaca) for a native "Circles" tab.
