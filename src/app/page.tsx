@@ -29,7 +29,7 @@ export default async function Home() {
       <p className="fade-up mt-4 max-w-[34rem] text-[15.5px] leading-relaxed text-text-2 sm:mt-6 sm:text-[19px]" style={{ ['--d' as string]: '200ms' }}>
         {PITCH}
       </p>
-      <p className="mt-4 hidden max-w-[34rem] text-[14px] leading-relaxed text-text-2 sm:block">
+      <p className="mt-4 hidden max-w-[34rem] text-[14px] leading-relaxed text-text-2 lg:block">
         Below is a real circle on {net}, read live from the chain through {BRAND_NAME}’s server relay. Its rounds are 10 minutes long so you can watch a whole cycle; real circles use a day or a week.
       </p>
     </div>
@@ -44,7 +44,7 @@ export default async function Home() {
           <p className="mt-8 text-text-2">No demo circle is configured for this network yet.</p>
         </>
       )}
-      <p className="mt-6 text-[13px] text-text-2 sm:hidden">
+      <p className="mt-6 text-[13px] text-text-2 lg:hidden">
         A real circle on {net}, read live through {BRAND_NAME}’s server relay. Its rounds are 10 minutes long so you can watch a whole cycle; real circles use a day or a week.
       </p>
 

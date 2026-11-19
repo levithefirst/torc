@@ -112,10 +112,10 @@ export function JudgeMode({ initial, paramsJson, names, circleName, stale, event
 
   return (
     <section data-testid="judge-mode">
-      <div className="grid items-start gap-x-14 gap-y-6 sm:gap-y-8 lg:grid-cols-12">
-        {intro && <div className="lg:col-span-7 lg:col-start-1 lg:row-start-1">{intro}</div>}
+      <div className="grid items-start gap-x-10 gap-y-6 sm:gap-y-8 md:grid-cols-12 lg:gap-x-14">
+        {intro && <div className="md:col-span-12 lg:col-span-7 lg:col-start-1 lg:row-start-1">{intro}</div>}
 
-        <div className="fade-up lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1 lg:pt-2" style={{ ['--d' as string]: '120ms' }}>
+        <div className="fade-up md:col-span-5 md:row-start-2 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1 lg:pt-2" style={{ ['--d' as string]: '120ms' }}>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b rule pb-2.5 sm:mb-5 sm:pb-3">
             <h2 className="text-[15px] font-semibold tracking-tight">{circleName}</h2>
             <StatusPill status={status} asOf={snap?.asOf} stale={stale && status !== 'live' && snap === initial} now={now} />
@@ -123,7 +123,7 @@ export function JudgeMode({ initial, paramsJson, names, circleName, stale, event
           {snap ? <Ring snap={snap} names={names} key={prevTurn} /> : <p className="py-24 text-center text-text-2">Reaching the chain…</p>}
         </div>
 
-        <div className="min-w-0 lg:col-span-7 lg:col-start-1 lg:row-start-2">
+        <div className="min-w-0 md:col-span-7 md:col-start-6 md:row-start-2 lg:col-span-7 lg:col-start-1 lg:row-start-2">
           {snap && (
             <div className="fade-up rounded-[20px] border rule bg-surface" style={{ ['--d' as string]: '220ms' }}>
               <div className="grid gap-4 p-5 sm:gap-5 sm:p-7">
