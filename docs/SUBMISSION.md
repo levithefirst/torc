@@ -35,10 +35,10 @@ writing the XO feedback are Fluid's steps (see "Still to do by hand").
 
 ### Description (≤ 300 words)
 
-In an ajo, the collector holds everyone's money. In Torc, nobody does.
+In a savings circle, one person holds everyone's money. In Torc, nobody does.
 
-Rotating savings circles (ajo, esusu, susu, tanda, chit fund) are how millions of people across West Africa,
-the Caribbean, Latin America and South Asia save. A small group pays a fixed amount every round and one member
+Rotating savings circles are how hundreds of millions of people save: tandas in Mexico, hui in China, chit funds in India, susu in Ghana, ajo and esusu in Nigeria,
+where Torc started. A small group pays a fixed amount every round and one member
 takes the whole pot, in turn, until everyone has had theirs. It works, but it rests on one person: the
 collector, who holds the cash and can disappear with it.
 
@@ -62,8 +62,8 @@ XO engine on chipnet.
 
 | Circle | Address |
 |---|---|
-| Lagos Market Circle (web demo) | `bchtest:pwn42zlapczu660my03ws0m7kfl6pl4350q4dvgvat0459n95wj6zfm4t4gzr` (token-aware `bchtest:rwn42zlapczu660my03ws0m7kfl6pl4350q4dvgvat0459n95wj6zmgf2vfmg`) |
-| Lagos Market Circle (CLI run) | `bchtest:r0dqyvgvlx5kvcd7wnx2fth23j7ssx4r54hgpzeekj808pj5crjlvvtej9w87` |
+| Torc Demo Circle (web demo; on-chain record "Lagos Market Circle") | `bchtest:pwn42zlapczu660my03ws0m7kfl6pl4350q4dvgvat0459n95wj6zfm4t4gzr` (token-aware `bchtest:rwn42zlapczu660my03ws0m7kfl6pl4350q4dvgvat0459n95wj6zmgf2vfmg`) |
+| CLI-run circle (record "Lagos Market Circle (CLI run)") | `bchtest:r0dqyvgvlx5kvcd7wnx2fth23j7ssx4r54hgpzeekj808pj5crjlvvtej9w87` |
 | XO Circle | see docs/XO.md (`deployments/chipnet-xo.json`) |
 
 ## Showcase transactions (chipnet, all confirmed)

@@ -3,7 +3,7 @@
 // the covenant. Rate limit: one action per 60 s per server instance, plus the covenant itself
 // (a payout before its time is impossible, so the answer is "available in N s").
 // Exception: the payout right after the round's last contribution skips the 60 s wait, so a
-// visitor sees "Ade received the pot" straight after 3 of 3. It is still one tx, still serialised
+// visitor sees "Maya received the pot" straight after 3 of 3. It is still one tx, still serialised
 // by inFlight, still refused by the covenant before the payout opens, and it moves funds only
 // from the covenant to the demo seat whose turn it is; the cooldown applies again after it.
 import { NextResponse } from 'next/server';

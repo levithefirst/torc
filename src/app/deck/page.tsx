@@ -35,7 +35,7 @@ const WALLET_TEST = [
   { what: 'Seat 3 pays 2,000 sats', txid: 'e32be41d17d2a82a595df90d4552e6e1519e261c8312391b3025936f4d94f2ea' },
   { what: 'Seat 2 pays 2,000 sats', txid: 'ffe74822eed7fe29996a155cf9bb817da50e3d67b832913898a3f8f999980aa3' },
 ];
-const CLI_CIRCLE_PAYOUTS = 2; // docs/DEPLOYMENTS.md, Lagos Market Circle (CLI run)
+const CLI_CIRCLE_PAYOUTS = 2; // docs/DEPLOYMENTS.md, the CLI-run circle
 
 function Slide({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
@@ -84,7 +84,7 @@ export default async function Deck() {
       <Slide n={1} title="Savings circles run on trust in one person">
         <p className="text-lg text-text sm:text-2xl">{PITCH}</p>
         <ul className="list-disc space-y-1 pl-5">
-          <li>Rotating savings circles (<B>ajo</B> and <B>esusu</B> in Nigeria, tanda, susu, chit funds) are how millions of traders save without a bank.</li>
+          <li>Rotating savings circles are a global habit: <B>tandas</B> in Mexico, <B>hui</B> in China, <B>chit funds</B> in India, <B>susu</B> in Ghana, <B>ajo</B> and <B>esusu</B> in Nigeria, where Torc started. Hundreds of millions of people save this way, often without a bank.</li>
           <li>Every member pays a fixed amount each round. Each round, one member takes the whole pot.</li>
           <li>The collector holds everyone’s money between rounds. When the collector disappears, so does the pot.</li>
         </ul>
@@ -144,7 +144,7 @@ export default async function Deck() {
         </div>
         <ul className="list-disc space-y-1 pl-5">
           <li><B>CashTokens</B> carry the seats, the state and the dollar (PUSD) natively: no bridge, no wrapped asset.</li>
-          <li>Fees small enough for a ₦1,000 contribution to make sense. Fees at 1 sat/byte, BCH at ${BCH_USD} (18 Nov 2026).</li>
+          <li>Fees small enough that even a $1 contribution makes sense. Fees at 1 sat/byte, BCH at ${BCH_USD} (18 Nov 2026).</li>
           <li>0-conf lets a market trader see their payment land while they are still at the stall.</li>
         </ul>
       </Slide>
@@ -193,9 +193,9 @@ export default async function Deck() {
       <Slide n={8} title="Business model and ask">
         <ul className="list-disc space-y-1 pl-5">
           <li><B>Free protocol.</B> Revenue from a small creation fee in the app, premium circles (reminders, bigger circles, the v2 bond), and white-label circles for cooperatives, church and market associations, and diaspora groups.</li>
-          <li><B>Distribution:</B> an existing ajo moves as a whole group, so one sign-up brings 3 to 5 members.</li>
-          <li><B>Team:</B> Fluid (builder), Lagos. Built during BCH BLAZE 2026, 18 to 22 Nov.</li>
-          <li><B>Ask:</B> a pilot with one Lagos market circle in PUSD, and intros to wallet teams (Selene, Paytaca) for a native “Circles” tab.</li>
+          <li><B>Distribution:</B> an existing circle moves as a whole group, so one sign-up brings 3 to 5 members.</li>
+          <li><B>Team:</B> Fluid (builder). Built during BCH BLAZE 2026, 18 to 22 Nov.</li>
+          <li><B>Ask:</B> a pilot with real circles in PUSD, starting with the ajo groups Torc came from, and intros to wallet teams (Selene, Paytaca) for a native “Circles” tab.</li>
         </ul>
         <p className="mt-auto text-[13px]">
           Code: <a className="text-accent-text underline" href={REPO_URL}>{REPO_URL.replace('https://', '')}</a> · Live: <a className="text-accent-text underline" href={SITE}>{SITE.replace('https://', '')}</a>

@@ -4,14 +4,14 @@ The live web deck is at https://torc-cash.vercel.app/deck (source: `src/app/deck
 from `docs/metrics.json`, `docs/LATENCY.md` and the demo circle on chain). This file is the plain-text outline.
 
 ## 1. Problem
-- Rotating savings circles (ajo, esusu, tanda, susu, chit funds) are used across West Africa, the Caribbean, Latin America and South Asia.
+- Rotating savings circles are a global habit: tandas in Mexico, hui in China, chit funds in India, susu in Ghana, ajo and esusu in Nigeria, where Torc started.
 - They run on trust in one person: the collector holds everyone's money.
 - When the collector disappears, so does the pot.
 
 ## 2. Product: Torc
 - A savings circle where a Bitcoin Cash covenant holds the pot. 3–5 members, a fixed dollar amount (PUSD), a fixed round length.
 - Each round the whole pot goes to the member whose turn it is, and only to them.
-- Pitch: "In an ajo, the collector holds everyone's money. In Torc, nobody does. The ring pays whoever's turn it is, and only them."
+- Pitch: "In a savings circle, one person holds everyone's money. In Torc, nobody does. The ring pays whoever's turn it is, and only them."
 
 ## 3. Live demo (link + QR)
 - https://torc-cash.vercel.app — opens on a live circle read from the chain; "Run the next step live" broadcasts a real tx.
@@ -39,8 +39,8 @@ from `docs/metrics.json`, `docs/LATENCY.md` and the demo circle on chain). This 
 
 ## 8. Business model and ask
 - Free core protocol. Revenue from: a small per-circle creation fee in the app; premium circles (reminders, larger circles, bond NFTs against default); white-label for cooperatives, church and market associations, and diaspora remittance circles.
-- Distribution: existing ajo groups move as a whole circle at once (3–5 users per acquisition).
+- Distribution: existing circles move as a whole circle at once (3–5 users per acquisition).
 
 ## Team + ask (on the business slide)
 - Fluid (builder). Built during BCH BLAZE 2026, 18–22 Nov.
-- Ask: Mainnet Track + Build with XO; pilot with one Lagos market circle in PUSD; intros to wallet teams (Selene, Paytaca) for a native "Circles" tab.
+- Ask: Mainnet Track + Build with XO; pilot with real circles in PUSD, starting with the ajo groups Torc came from; intros to wallet teams (Selene, Paytaca) for a native "Circles" tab.

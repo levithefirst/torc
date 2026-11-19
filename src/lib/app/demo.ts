@@ -29,7 +29,13 @@ function load(): DemoCircle | null {
   };
 }
 
-export const DEMO = load();
+// Display names for the demo circle. The on-chain records (deployments/*.json) keep their original
+// names; the site shows a global cast.
+function display(d: DemoCircle | null): DemoCircle | null {
+  return d && { ...d, name: 'Torc Demo Circle', seatNames: ['Maya', 'Kofi', 'Diego'].concat(d.seatNames.slice(3)) };
+}
+
+export const DEMO = display(load());
 
 export const PUSD_MAINNET = '2469acc5afa4b10cb5b5c04afb89c3a3ffd61c5da9c01e26d00951cae2a02544';
 

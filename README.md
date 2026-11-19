@@ -1,11 +1,11 @@
 # Torc
 
-> In an ajo, the collector holds everyone's money. In Torc, nobody does. The ring pays whoever's turn it is, and only them.
+> In a savings circle, one person holds everyone's money. In Torc, nobody does. The ring pays whoever's turn it is, and only them.
 
-Torc is an ajo / esusu **rotating savings circle on Bitcoin Cash**. Three to five members each put a fixed
+Torc is a **rotating savings circle on Bitcoin Cash**. Three to five members each put a fixed
 dollar amount (PUSD) into the circle every round, and a CashScript covenant pays the whole pot only to the
 member whose turn it is. Membership is a CashTokens NFT, the circle's state is a CashTokens NFT, and no
-collector (alajo) ever holds the money. There is no admin key.
+collector ever holds the money. There is no admin key.
 
 **Try it in 10 seconds:** https://torc-cash.vercel.app (chipnet). No wallet, no setup: the home page reads a live
 circle from the chain, and "Run the next step live" broadcasts a real transaction you watch land as SEEN 0-conf.
@@ -21,7 +21,7 @@ Built during BCH BLAZE 2026 (all commits 18–22 Nov 2026). Mainnet Track + Gene
 A torc is the Iron Age neck ring: a closed circle of twisted gold that held the wearer's wealth. Torc is the
 members' pooled pot, locked in one unbreakable ring, passing hand to hand as each turn comes round.
 
-Rotating savings circles are used across West Africa, the Caribbean, Latin America and South Asia. They work
+Rotating savings circles are a global habit: tandas in Mexico, hui in China, chit funds in India, susu in Ghana, ajo and esusu in Nigeria, where Torc started. They work
 on trust in one person, the collector. Torc keeps the social contract (fixed members, fixed amount, a fixed
 turn order) and removes the one point of failure: the money sits in a covenant that can only ever pay the
 seat whose turn it is.
@@ -35,9 +35,9 @@ contribution, with no admin key and no custodian.**
 ```mermaid
 flowchart LR
   subgraph Wallets
-    A[Ade's wallet<br/>member NFT seat 1]
-    B[Bisi's wallet<br/>member NFT seat 2]
-    C[Chidi's wallet<br/>member NFT seat 3]
+    A[Maya's wallet<br/>member NFT seat 1]
+    B[Kofi's wallet<br/>member NFT seat 2]
+    C[Diego's wallet<br/>member NFT seat 3]
   end
   subgraph Covenant["TorcCircle covenant (P2SH32)"]
     S[(State NFT<br/>round · roundStart · paidMask)]
@@ -113,11 +113,11 @@ In PUSD mode each contribution UTXO carries exactly 1,000 sats (enforced), which
 
 See [docs/DEPLOYMENTS.md](docs/DEPLOYMENTS.md) (generated from `deployments/*.json`, every txid linked).
 
-- **Chipnet web demo:** "Lagos Market Circle", `bchtest:rwn42zlapczu660my03ws0m7kfl6pl4350q4dvgvat0459n95wj6zmgf2vfmg`
+- **Chipnet web demo:** shown on the site as "Torc Demo Circle" (seats Maya, Kofi, Diego; the on-chain record calls it "Lagos Market Circle"), `bchtest:rwn42zlapczu660my03ws0m7kfl6pl4350q4dvgvat0459n95wj6zmgf2vfmg`
   (seats held by the server's demo keys, driven by the site's button; **10-minute test rounds**, real circles
   use a day or a week). The site reads it through its own `/api/chain` / `/api/circle` relay (the server talks
   Electrum), so browsers never need a WebSocket.
-- **Chipnet CLI run:** "Lagos Market Circle (CLI run)", 2 full rounds plus a seat transfer (Chidi → Dayo).
+- **Chipnet CLI run:** recorded as "Lagos Market Circle (CLI run)", 2 full rounds plus a seat transfer (seat 3 moved to a new holder).
 - **Chipnet XO run:** "XO Circle", contributions made through the XO engine (see docs/XO.md).
 - **tPUSD** (chipnet test asset, 2 decimals like PUSD): `fb9175ea28b49f530d1e21d521f52c91cf52db90c07af4c5bffbb85fcbb725d4`.
 - **Mainnet:** every path is built and tested and switches on by env alone (`NEXT_PUBLIC_NETWORK=mainnet`,

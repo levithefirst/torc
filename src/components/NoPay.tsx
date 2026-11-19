@@ -1,6 +1,6 @@
 import { REPO_URL } from '@/lib/chain/config';
 
-/** The first question every ajo member asks, answered honestly: what Torc does today, and v2. */
+/** The first question every savings-circle member asks, answered honestly: what Torc does today, and v2. */
 export function NoPay({ compact = false }: { compact?: boolean }) {
   return (
     <section id="if-someone-doesnt-pay" className={compact ? '' : 'mt-10 rounded-[var(--radius)] border border-border-subtle p-4 sm:p-5'} data-testid="no-pay">
