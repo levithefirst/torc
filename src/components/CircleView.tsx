@@ -35,20 +35,29 @@ function Inner({ paramsJson, initial, names, name }: { paramsJson: CircleParamsJ
   const asset = assetInfo(paramsJson);
   if (!snap) return <p className="py-10 text-text-2">Reading this circle from the chain…</p>;
   return (
-    <section className="grid gap-8 md:grid-cols-[minmax(0,340px)_minmax(0,1fr)]">
-      <div>
-        <h1 className="mb-1 text-lg font-semibold">{name}</h1>
-        <p className="num mb-3 break-all text-[12px] text-text-2" data-testid="covenant-address">{snap.tokenAddress}</p>
-        <Ring snap={snap} names={names} />
+    <section className="pt-4 sm:pt-8">
+      <div className="mb-10 border-b rule pb-8">
+        <p className="eyebrow mb-4 flex items-center gap-2"><span aria-hidden className="inline-block h-px w-6 bg-accent" /> Circle · {params.seats} seats · {fmtUnits(params.contribution, asset)} each</p>
+        <h1 className="text-[clamp(36px,6vw,72px)] font-semibold leading-[0.95] tracking-[-0.045em]">{name}</h1>
+        <p className="num mt-4 max-w-full break-all text-[12px] text-text-2" data-testid="covenant-address">{snap.tokenAddress}</p>
       </div>
-      <div className="grid min-w-0 content-start gap-5">
-        <p className="text-[15px]">
-          <span className="num text-xl font-semibold">{fmtUnits(snap.potUnits, asset)}</span> <span className="text-text-2">in the ring ·</span> {snap.paid} of {params.seats} paid · {payoutLine(snap, Date.now())}
-        </p>
-        <MemberPanel snap={snap} params={params} names={names} onSent={() => setTimeout(refresh, 800)} />
-        <div>
-          <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-text-2">On-chain activity</h3>
-          <Feed rows={snap.feed} names={names} asset={asset} total={snap.historyCount} address={snap.address} />
+      <div className="grid gap-x-14 gap-y-10 lg:grid-cols-12">
+        <div className="lg:col-span-5">
+          <Ring snap={snap} names={names} />
+        </div>
+        <div className="grid min-w-0 content-start gap-8 lg:col-span-7">
+          <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 rounded-[20px] border rule bg-surface p-5 sm:p-7">
+            <div>
+              <div className="eyebrow mb-2">In the ring</div>
+              <div className="num text-[clamp(36px,6vw,56px)] font-medium leading-none tracking-[-0.04em]">{fmtUnits(snap.potUnits, asset)}</div>
+            </div>
+            <p className="text-[14px] text-text-2"><span className="num text-text">{snap.paid} of {params.seats}</span> paid · {payoutLine(snap, Date.now())}</p>
+          </div>
+          <MemberPanel snap={snap} params={params} names={names} onSent={() => setTimeout(refresh, 800)} />
+          <div>
+            <h3 className="eyebrow mb-3">On-chain activity</h3>
+            <Feed rows={snap.feed} names={names} asset={asset} total={snap.historyCount} address={snap.address} />
+          </div>
         </div>
       </div>
     </section>

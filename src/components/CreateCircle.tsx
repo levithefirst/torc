@@ -91,28 +91,33 @@ function Form() {
     } finally { setBusy(null); }
   }
 
-  const input = 'w-full rounded border border-border bg-bg px-2 py-1.5 text-sm';
+  const input = 'w-full rounded-xl border border-border bg-bg px-3 py-2.5 text-sm transition-colors hover:border-text focus:border-accent focus:outline-none';
+  const sym = mode === 'token' ? ASSET_SYMBOL : 'sats';
+  const periodLabel = PERIODS.find((p) => p.s === period)?.label ?? `${period} s`;
+  const Step = ({ n, children }: { n: string; children: React.ReactNode }) => (
+    <span className="flex items-center gap-3 text-[15px] font-semibold tracking-tight"><span className="num grid size-7 place-items-center rounded-full border rule text-[11px] font-normal text-text-2">{n}</span>{children}</span>
+  );
   return (
-    <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_300px]">
-      <form className="grid gap-4" onSubmit={(e) => e.preventDefault()} data-testid="create-form">
+    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <form className="grid gap-9" onSubmit={(e) => e.preventDefault()} data-testid="create-form">
         <fieldset className="grid gap-1">
-          <legend className="mb-1 text-sm font-semibold">Seats</legend>
-          <div className="flex gap-2">
+          <legend className="mb-3"><Step n="1">Seats</Step></legend>
+          <div className="flex gap-2 pl-10">
             {[3, 4, 5].map((n) => (
-              <button key={n} type="button" onClick={() => setSeats(n)} aria-pressed={seats === n} className={`rounded border px-3 py-1.5 text-sm ${seats === n ? 'border-accent bg-surface-2' : 'border-border'}`}>{n}</button>
+              <button key={n} type="button" onClick={() => setSeats(n)} aria-pressed={seats === n} className={`num grid size-12 place-items-center rounded-full border text-[16px] transition-colors ${seats === n ? 'border-text bg-text text-bg' : 'border-border hover:border-text'}`}>{n}</button>
             ))}
           </div>
         </fieldset>
-        <fieldset className="grid gap-2">
-          <legend className="mb-1 flex items-center gap-3 text-sm font-semibold">
-            Member addresses, in payout order
-            {w.ready && <button type="button" onClick={fillMine} className="rounded border border-border px-2 py-0.5 text-[12px] font-normal">Use my address for every seat</button>}
+        <fieldset className="grid gap-2 pl-10">
+          <legend className="-ml-10 mb-3 flex flex-wrap items-center gap-3">
+            <Step n="2">Member addresses, in payout order</Step>
+            {w.ready && <button type="button" onClick={fillMine} className="btn btn-ghost px-3 py-1 text-[12px] font-normal">Use my address for every seat</button>}
           </legend>
           {Array.from({ length: seats }, (_, i) => (
-            <input key={i} className={`${input} num`} placeholder={`${NETWORK === 'mainnet' ? 'bitcoincash' : 'bchtest'}:… seat ${i + 1}`} value={members[i]} onChange={(e) => setMembers(members.map((m, j) => (j === i ? e.target.value : m)))} aria-label={`Seat ${i + 1} address`} />
+            <div key={i} className="relative"><span className="num pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-text-2">{String(i + 1).padStart(2, '0')}</span><input className={`${input} num pl-10`} placeholder={`${NETWORK === 'mainnet' ? 'bitcoincash' : 'bchtest'}:… seat ${i + 1}`} value={members[i]} onChange={(e) => setMembers(members.map((m, j) => (j === i ? e.target.value : m)))} aria-label={`Seat ${i + 1} address`} /></div>
           ))}
         </fieldset>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <fieldset className="grid gap-3"><legend className="mb-3"><Step n="3">Terms</Step></legend><div className="grid gap-3 pl-10 sm:grid-cols-3">
           <label className="grid gap-1 text-sm">
             <span className="font-semibold">Asset</span>
             <select className={input} value={mode} onChange={(e) => { const m = e.target.value as AssetMode; setMode(m); setAmount(m === 'token' ? '0.10' : '2000'); }}>
@@ -130,13 +135,19 @@ function Form() {
               {PERIODS.map((p) => <option key={p.s} value={p.s}>{p.label}</option>)}
             </select>
           </label>
-        </div>
+        </div></fieldset>
+        <div className="grid gap-4 rounded-[20px] border rule bg-surface p-5 sm:p-6" data-testid="create-summary">
+          <Step n="4">Create</Step>
+          <p className="text-[15px] text-text-2">
+            <span className="num text-text">{seats}</span> seats × <span className="num text-text">{amount || '0'} {sym}</span> = a <span className="num text-text">{contribution > 0n ? (mode === 'token' ? (Number(contribution * BigInt(seats)) / 100).toFixed(2) : (contribution * BigInt(seats)).toLocaleString('en-US')) : '0'} {sym}</span> pot, paid out every <span className="text-text">{periodLabel}</span>, one seat at a time.
+          </p>
         <div className="flex flex-wrap items-center gap-3">
           <ConnectButton />
-          <button type="button" disabled={!valid || !w.ready || !!busy} onClick={create} className={`rounded-[var(--radius)] px-4 py-2 text-sm font-semibold disabled:opacity-60 ${w.ready ? 'bg-accent text-on-accent' : 'border border-border text-text-2'}`} data-testid="btn-create">
+          <button type="button" disabled={!valid || !w.ready || !!busy} onClick={create} className={`btn px-5 py-2.5 text-sm disabled:opacity-60 ${w.ready ? 'btn-gold' : 'border border-border text-text-2'}`} data-testid="btn-create">
             {busy ? 'Check your wallet…' : 'Create circle'}
           </button>
-          <button type="button" onClick={dryRun} className="rounded-[var(--radius)] border border-border px-4 py-2 text-sm" data-testid="btn-dry-run">Dry run (no wallet)</button>
+          <button type="button" onClick={dryRun} className="btn btn-ghost px-5 py-2.5 text-sm font-medium" data-testid="btn-dry-run">Dry run (no wallet)</button>
+        </div>
         </div>
         {problems.length > 0 && (
           <p className="text-sm text-warning" data-testid="create-problems">Check: {problems.join('; ')}.</p>
@@ -147,7 +158,7 @@ function Form() {
           </p>
         )}
         {dry && (
-          <div className="rounded border border-dashed border-border p-3 text-sm" data-testid="dry-run-result">
+          <div className="land rounded-[20px] border border-dashed border-border p-5 text-sm" data-testid="dry-run-result">
             <div className="font-semibold">Unsigned genesis (dry run, example input{list.some((m) => !isValidAddress(m, NETWORK)) ? '; empty or invalid seats use example addresses' : ''})</div>
             <p className="mt-1 text-text-2">
               {dry.outputs} outputs: 1 state NFT into the covenant, {dry.seats} member NFTs, the params OP_RETURN, change. <span className="num">{dry.size} bytes · {dry.fee} sats fee</span>.
@@ -157,9 +168,9 @@ function Form() {
           </div>
         )}
       </form>
-      <aside className="h-fit rounded-[var(--radius)] border border-border-subtle bg-surface p-4 text-sm" data-testid="judge-path">
-        <h2 className="font-semibold">Judge path · 30 seconds</h2>
-        <ol className="mt-2 grid list-decimal gap-1.5 pl-5 text-text-2">
+      <aside className="h-fit rounded-[20px] border rule p-5 text-sm sm:p-6 lg:sticky lg:top-6" data-testid="judge-path">
+        <h2 className="eyebrow">Judge path · 30 seconds</h2>
+        <ol className="mt-4 grid list-decimal gap-3 pl-5 text-text-2 marker:font-mono marker:text-text-2">
           <li>Tap <b className="text-text">Connect wallet</b> and scan with Selene (WizardConnect).</li>
           <li>Tap <b className="text-text">Use my address for every seat</b>.</li>
           <li>Pick {mode === 'token' ? ASSET_SYMBOL : 'BCH'}, keep the amount small, tap <b className="text-text">Create circle</b> and approve.</li>

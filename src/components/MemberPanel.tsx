@@ -85,8 +85,8 @@ export function MemberPanel({ snap, params, names, onSent }: { snap: Snapshot; p
   }
 
   return (
-    <div className="rounded-[var(--radius)] border border-border-subtle bg-surface p-4" data-testid="member-panel">
-      <h3 className="mb-2 font-semibold">Your seats</h3>
+    <div className="rounded-[20px] border rule p-5 sm:p-7" data-testid="member-panel">
+      <h3 className="mb-4 text-[18px] font-semibold tracking-tight">Your seats</h3>
       <ConnectButton />
       {w.ready && !w.scanning && mine.length === 0 && (
         <p className="mt-3 text-sm text-text-2">This wallet holds no seat in this circle on {NETWORK}. A seat is a member NFT; whoever holds it is that seat.</p>
@@ -102,8 +102,8 @@ export function MemberPanel({ snap, params, names, onSent }: { snap: Snapshot; p
           const dueMs = toWall(snap, opensAt);
           const payMs = toWall(snap, payoutChain);
           return (
-            <li key={`${nft.txid}:${nft.vout}`} className="rounded border border-border-subtle p-3 text-sm" data-testid={`my-seat-${seat}`}>
-              <div className="font-medium">Seat {seat + 1} · {holderLabel(nft, seat)} {paid && <span className="ml-1 rounded border border-confirmed px-1.5 text-[11px] font-semibold text-confirmed" data-testid="paid-badge">PAID THIS ROUND</span>} {isTurn && <span className="ml-1 rounded bg-accent px-1.5 text-[11px] font-semibold text-on-accent">YOUR TURN</span>}</div>
+            <li key={`${nft.txid}:${nft.vout}`} className="rounded-2xl border rule bg-surface p-4 text-sm" data-testid={`my-seat-${seat}`}>
+              <div className="font-medium">Seat {seat + 1} · {holderLabel(nft, seat)} {paid && <span className="num ml-1 rounded-full border border-confirmed px-2 text-[10.5px] font-semibold text-confirmed" data-testid="paid-badge">PAID THIS ROUND</span>} {isTurn && <span className="num ml-1 rounded-full bg-accent px-2 text-[10.5px] font-semibold text-on-accent">YOUR TURN</span>}</div>
               <p className="mt-1 text-text-2">
                 {paid ? 'Paid this round. ' : <>Your next contribution is due by <b className="text-text">{fmtWhen(dueMs)}</b>. </>}
                 Your payout: <b className="text-text">{fmtWhen(payMs)}</b>{' '}
@@ -112,17 +112,17 @@ export function MemberPanel({ snap, params, names, onSent }: { snap: Snapshot; p
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {!paid && (
-                  <button disabled={!!busy} onClick={() => act('Contribution', () => contribute(nft, seat))} className="rounded bg-accent px-3 py-1.5 font-semibold text-on-accent disabled:opacity-50" data-testid="btn-contribute">
+                  <button disabled={!!busy} onClick={() => act('Contribution', () => contribute(nft, seat))} className="btn btn-gold px-4 py-2 disabled:opacity-50" data-testid="btn-contribute">
                     {busy === 'Contribution' ? 'Check your wallet…' : `Contribute ${fmtUnits(params.contribution, asset)}`}
                   </button>
                 )}
-                <button disabled={!!busy || !isTurn || !allPaid(snap.state, params.seats) || !open} onClick={() => act('Claim', () => claim(nft))} className="rounded border border-border px-3 py-1.5 disabled:opacity-50" data-testid="btn-claim">
+                <button disabled={!!busy || !isTurn || !allPaid(snap.state, params.seats) || !open} onClick={() => act('Claim', () => claim(nft))} className="btn btn-ghost px-4 py-2 font-medium disabled:opacity-50" data-testid="btn-claim">
                   {busy === 'Claim' ? 'Check your wallet…' : 'Claim the pot'}
                 </button>
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <input value={dest} onChange={(e) => setDest(e.target.value)} placeholder={`${NETWORK === 'mainnet' ? 'bitcoincash' : 'bchtest'}:… new holder`} className="num min-w-0 flex-1 rounded border border-border bg-bg px-2 py-1 text-[12px]" aria-label="Address to transfer this seat to" />
-                <button disabled={!!busy || !dest} onClick={() => act('Seat transfer', () => transfer(nft))} className="rounded border border-border px-3 py-1 text-[12px] disabled:opacity-50">Transfer seat</button>
+                <input value={dest} onChange={(e) => setDest(e.target.value)} placeholder={`${NETWORK === 'mainnet' ? 'bitcoincash' : 'bchtest'}:… new holder`} className="num min-w-0 flex-1 rounded-full border border-border bg-bg px-3 py-1.5 text-[12px]" aria-label="Address to transfer this seat to" />
+                <button disabled={!!busy || !dest} onClick={() => act('Seat transfer', () => transfer(nft))} className="btn btn-ghost px-3 py-1.5 text-[12px] font-medium disabled:opacity-50">Transfer seat</button>
               </div>
             </li>
           );
