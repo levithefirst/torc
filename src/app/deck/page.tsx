@@ -111,9 +111,9 @@ export default async function Deck() {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               <Stat value={`${lat.state} ms`} label="median time to a live circle on screen" />
               <Stat value={`${lat.seen} ms`} label="median click to SEEN 0-conf" />
-              {demoPayouts !== null && <Stat value={String(demoPayouts)} label={`payouts made by the ${NETWORK} demo circle${demoTxs ? ` (${demoTxs} txs)` : ''}`} />}
+              {demoPayouts !== null && <Stat value={String(demoPayouts)} label={`payouts made by the ${NETWORK} demo circle${demoTxs ? ` (${demoTxs} ${demoTxs === 1 ? 'tx' : 'txs'})` : ''}`} />}
             </div>
-            <p className="text-[13px]">Production, 10 runs, 19 Nov 2026 (docs/LATENCY.md). The demo circle uses 10-minute test rounds so a full cycle fits in a visit.</p>
+            <p className="text-[13px]">Production, 10 runs, 19 Nov 2026, measured on the chipnet deployment before the mainnet switch (docs/LATENCY.md). The demo circle uses 10-minute test rounds so a full cycle fits in a visit.</p>
           </div>
           <div className="mx-auto w-[180px] overflow-hidden rounded bg-[#FBF9F5] p-2" aria-label="QR code for torc-cash.vercel.app" dangerouslySetInnerHTML={{ __html: qr }} />
         </div>
