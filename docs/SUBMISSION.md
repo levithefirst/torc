@@ -19,7 +19,7 @@ writing the XO feedback are Fluid's steps (see "Still to do by hand").
 | Mainnet seeding | **Waiting** on Fluid's approval and a funded throwaway key: HANDOFF §3 |
 | Donation address in banner | **Placeholder**: HANDOFF §6 |
 | Demo video | **Placeholder**: record per docs/DEMO-SCRIPT.md (HANDOFF §8) |
-| XO feedback (~500 words, by hand) | **Placeholder**: docs/XO-FEEDBACK.md |
+| XO feedback (~500 words, by hand) | **Done**: docs/XO-FEEDBACK.md (by Fluid) |
 | Repo public | **Private** until Fluid says so |
 
 ## DoraHacks BUIDL draft
