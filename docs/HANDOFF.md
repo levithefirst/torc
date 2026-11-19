@@ -1,7 +1,7 @@
 # HANDOFF: the steps a browser or a human must do
 
 For the Torc bot (and Fluid). Everything else is automated. Numbered, copy-pasteable, in priority order.
-Live site: **https://torc-cash.vercel.app** · Vercel project `torc` (team "levithefirst-1227's projects").
+Live site: **https://usetorc.vercel.app** · Vercel project `torc` (team "levithefirst-1227's projects").
 
 Status legend: ✅ done by Claude Code · ⏳ waiting on you · 🔒 needs Fluid's explicit OK first.
 
@@ -41,13 +41,13 @@ Everything is built and tested; mainnet is switched on by env alone. When Fluid 
 ## 4. Real wallet test (chipnet)
 Done on 19 Nov 2026 with the Paytaca browser extension: create + all 3 seats paid (txids in README "Wallets",
 viewable on https://explorer.selene.cash with `?network=chipnet`). Selene is still untested. Note: production
-(torc-cash.vercel.app) is now **mainnet**, so a chipnet re-test needs a chipnet build (`npm run dev`, which
+(usetorc.vercel.app) is now **mainnet**, so a chipnet re-test needs a chipnet build (`npm run dev`, which
 defaults to chipnet) and the steps below on localhost; on mainnet the same steps spend real sats.
 
 Steps (Selene, Pixel 7):
 1. Install Selene (selene.cash) on the Pixel. Settings → network → Chipnet. Get test coins: open
    https://chipnet.bch.ninja, paste Selene's receive address, request 100,000 sats.
-2. On the phone open https://torc-cash.vercel.app/new → **Connect wallet** → in Selene scan or open the
+2. On the phone open https://usetorc.vercel.app/new → **Connect wallet** → in Selene scan or open the
    WizardConnect link. Approve the connection.
 3. Tap **Use my address for every seat**, Asset **BCH (sats)**, amount 2000, round length 10 minutes, **Create circle**,
    approve in Selene. (If it asks first for "Prepare a coin", approve that too.)
@@ -72,7 +72,7 @@ Steps (Selene, Pixel 7):
 `public/brand/torc-mark.svg` (viewBox 0 0 64 64) and re-run `python3 tools/make_mark.py` only if you change the geometry.
 
 ## 8. ⏳ Video (2:00, Pixel 7 screen recorder)
-Follow docs/DEMO-SCRIPT.md shot by shot. Record at https://torc-cash.vercel.app, portrait.
+Follow docs/DEMO-SCRIPT.md shot by shot. Record at https://usetorc.vercel.app, portrait.
 Pixel: swipe down twice → Screen record → "Record audio: Microphone" → Start. Upload is Fluid's call.
 
 ## 9. Fluid only (Claude Code does none of these)

@@ -9,7 +9,7 @@ writing the XO feedback are Fluid's steps (see "Still to do by hand").
 |---|---|
 | Covenant + 14 attack tests (27 tests in all), contract and unit tests green | Done (`npm test`, CI) |
 | Chipnet web demo circle, CLI circle (2 rounds + seat transfer), XO circle | Done (docs/DEPLOYMENTS.md, docs/XO.md) |
-| Live app on Vercel: judge mode, member view, /new, /deck, banner on every page | Done: https://torc-cash.vercel.app |
+| Live app on Vercel: judge mode, member view, /new, /deck, banner on every page | Done: https://usetorc.vercel.app |
 | Judge spec 14/14 on production, incl. test 7 (Electrum down) | Done (docs/JUDGE-SPEC.md) |
 | 10-run latency on production | Done: median 1.2 s to state, 2.4 s click to SEEN 0-conf (docs/LATENCY.md) |
 | XO template + a valid XO tx on chipnet | Done (docs/XO.md) |
@@ -28,7 +28,7 @@ writing the XO feedback are Fluid's steps (see "Still to do by hand").
 - **Tagline:** A rotating savings circle on Bitcoin Cash. Nobody holds the pot.
 - **Track:** Mainnet Track
 - **Bounty:** General Protocols, "Build with XO"
-- **Live URL:** https://torc-cash.vercel.app (chipnet; mainnet switches on by env)
+- **Live URL:** https://usetorc.vercel.app (chipnet; mainnet switches on by env)
 - **Repo:** https://github.com/levithefirst/torc
 - **Video:** `<VIDEO URL: to be recorded>`
 - **Donation / vote address:** `<ADDRESS: Fluid to supply>`

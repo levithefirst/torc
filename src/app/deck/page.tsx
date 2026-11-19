@@ -11,7 +11,7 @@ export const metadata = { title: 'Deck' };
 // Re-read the live circle at most every 5 minutes; the rest is fixed at build time.
 export const revalidate = 300;
 
-const SITE = 'https://torc-cash.vercel.app';
+const SITE = 'https://usetorc.vercel.app';
 // BCH price used for the dollar figures (CoinGecko, 18 Nov 2026), as in the README.
 const BCH_USD = 208.25;
 const usd = (sats: number) => `$${((sats * BCH_USD) / 1e8).toFixed(4).replace(/0+$/, '').replace(/\.$/, '')}`;
@@ -105,7 +105,7 @@ export default async function Deck() {
         <div className="grid items-center gap-6 sm:grid-cols-[1fr_200px]">
           <div className="grid gap-3">
             <p>
-              <a className="text-xl font-semibold text-accent-text underline" href={SITE}>torc-cash.vercel.app</a>
+              <a className="text-xl font-semibold text-accent-text underline" href={SITE}>usetorc.vercel.app</a>
             </p>
             <p>The page opens on a real circle on {NETWORK === 'mainnet' ? 'BCH mainnet' : NETWORK}. One click on <B>Run the next step live</B> signs and broadcasts its next real transaction (a payment, or the payout) with a demo seat key on the server. No wallet needed.</p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -115,7 +115,7 @@ export default async function Deck() {
             </div>
             <p className="text-[13px]">Production, 10 runs, 19 Nov 2026, measured on the chipnet deployment before the mainnet switch (docs/LATENCY.md). The demo circle uses 10-minute test rounds so a full cycle fits in a visit.</p>
           </div>
-          <div className="mx-auto w-[180px] overflow-hidden rounded bg-[#FBF9F5] p-2" aria-label="QR code for torc-cash.vercel.app" dangerouslySetInnerHTML={{ __html: qr }} />
+          <div className="mx-auto w-[180px] overflow-hidden rounded bg-[#FBF9F5] p-2" aria-label="QR code for usetorc.vercel.app" dangerouslySetInnerHTML={{ __html: qr }} />
         </div>
       </Slide>
 

@@ -7,7 +7,7 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   reporter: [['list']],
-  use: { baseURL: process.env.BASE_URL || 'https://torc-cash.vercel.app', trace: 'off' },
+  use: { baseURL: process.env.BASE_URL || 'https://usetorc.vercel.app', trace: 'off' },
   projects: [
     {
       name: 'mobile',

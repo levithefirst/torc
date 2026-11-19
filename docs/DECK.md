@@ -1,6 +1,6 @@
 # Torc deck (8 slides)
 
-The live web deck is at https://torc-cash.vercel.app/deck (source: `src/app/deck/page.tsx`; its numbers come
+The live web deck is at https://usetorc.vercel.app/deck (source: `src/app/deck/page.tsx`; its numbers come
 from `docs/metrics.json`, `docs/LATENCY.md` and the demo circle on chain). This file is the plain-text outline.
 
 ## 1. Problem
@@ -14,7 +14,7 @@ from `docs/metrics.json`, `docs/LATENCY.md` and the demo circle on chain). This 
 - Pitch: "In a savings circle, one person holds everyone's money. In Torc, nobody does. The ring pays whoever's turn it is, and only them."
 
 ## 3. Live demo (link + QR)
-- https://torc-cash.vercel.app — opens on a live circle read from the chain; "Run the next step live" broadcasts a real tx.
+- https://usetorc.vercel.app — opens on a live circle read from the chain; "Run the next step live" broadcasts a real tx.
 - QR code to the URL. Screenshot of the ring + feed with a SEEN 0-conf row.
 
 ## 4. How the covenant works

@@ -4,7 +4,7 @@
 # chain time), the run waits N+5 s and tries again (up to 4 attempts), so every run measures a real broadcast.
 # Appends one JSON line per run to $OUT, keeping the waits it saw.
 set -u
-BASE_URL="${BASE_URL:-https://torc-cash.vercel.app}"
+BASE_URL="${BASE_URL:-https://usetorc.vercel.app}"
 OUT=${OUT:-docs/runs/latency-runs.jsonl}
 LOGDIR=${LOGDIR:-/tmp}
 mkdir -p "$(dirname "$OUT")" "$LOGDIR"
