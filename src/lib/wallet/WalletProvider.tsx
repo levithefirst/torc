@@ -6,7 +6,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useWizardConnect, WizardConnectQRDialog } from '@wizardconnect/react';
 import { placeholderP2PKHUnlocker, isPlaceholderUnlocker, type SpendableUtxo, type TransactionBuilder } from 'cashscript';
-import { encodeCashAddress, hash160, binToHex } from '@bitauth/libauth';
+import { encodeCashAddress, hash160, binToHex, stringify } from '@bitauth/libauth';
 import { BRAND_NAME, BRAND_SLUG } from '@/brand';
 import { NETWORK, electrumHosts } from '@/lib/chain/config';
 import { wsWithRelayFallback } from '@/lib/chain/electrum';
@@ -110,7 +110,10 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       inputPaths.push([i, a.path, a.index]);
     });
     const transaction = builder.generateWcTransactionObject({ broadcast: false, userPrompt: prompt });
-    const res = await m.signTransaction({ transaction: transaction as never, inputPaths });
+    // The relay sends plain JSON: encode BigInt/Uint8Array as WizardConnect extended JSON
+    // (`<bigint: Xn>`, `<Uint8Array: 0x..>`), which wallets decode with parseExtendedJson.
+    const relaySafe = JSON.parse(stringify(transaction));
+    const res = await m.signTransaction({ transaction: relaySafe as never, inputPaths });
     if (res.error || !res.signedTransaction) throw new Error(res.error || 'wallet returned no signature');
     const txid = await provider.sendRawTransaction(res.signedTransaction);
     setTimeout(rescan, 1500);
