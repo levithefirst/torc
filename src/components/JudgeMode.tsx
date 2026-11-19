@@ -112,11 +112,11 @@ export function JudgeMode({ initial, paramsJson, names, circleName, stale, event
 
   return (
     <section data-testid="judge-mode">
-      <div className="grid items-start gap-x-14 gap-y-8 lg:grid-cols-12">
+      <div className="grid items-start gap-x-14 gap-y-6 sm:gap-y-8 lg:grid-cols-12">
         {intro && <div className="lg:col-span-7 lg:col-start-1 lg:row-start-1">{intro}</div>}
 
         <div className="fade-up lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1 lg:pt-2" style={{ ['--d' as string]: '120ms' }}>
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b rule pb-3">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b rule pb-2.5 sm:mb-5 sm:pb-3">
             <h2 className="text-[15px] font-semibold tracking-tight">{circleName}</h2>
             <StatusPill status={status} asOf={snap?.asOf} stale={stale && status !== 'live' && snap === initial} now={now} />
           </div>
@@ -126,7 +126,7 @@ export function JudgeMode({ initial, paramsJson, names, circleName, stale, event
         <div className="min-w-0 lg:col-span-7 lg:col-start-1 lg:row-start-2">
           {snap && (
             <div className="fade-up rounded-[20px] border rule bg-surface" style={{ ['--d' as string]: '220ms' }}>
-              <div className="grid gap-5 p-5 sm:p-7">
+              <div className="grid gap-4 p-5 sm:gap-5 sm:p-7">
                 <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4" data-testid="pot">
                   <div>
                     <div className="eyebrow mb-2">In the ring</div>
@@ -141,7 +141,7 @@ export function JudgeMode({ initial, paramsJson, names, circleName, stale, event
                     <div className="num text-[13px]"><span className="text-text">{snap.paid} of {snap.params.seats}</span> <span className="text-text-2">paid</span></div>
                   </div>
                 </div>
-                <div className="grid gap-1 border-t rule pt-4 text-[14px]">
+                <div className="order-3 grid gap-1 border-t rule pt-4 text-[14px] sm:order-none">
                   <p>{payoutLine(snap, now ?? snap.asOf)}</p>
                   <p className="text-text-2" data-testid="turn-label">
                     Round {snap.state.round + 1} · pays <span className="font-medium text-text">{seatName(names, snap.turnSeat)}</span> next · <span className="num">{fmtUnits(potTotal, asset)}</span> pot

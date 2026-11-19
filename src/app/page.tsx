@@ -18,18 +18,18 @@ export default async function Home() {
   if (DEMO && !r.snap && process.env.NEXT_PHASE !== 'phase-production-build') throw new Error('chain unreachable; keeping last good render');
   const net = NETWORK === 'mainnet' ? 'BCH mainnet' : NETWORK;
   const intro = (
-    <div className="pt-4 sm:pt-10">
-      <p className="eyebrow fade-up mb-5 flex items-center gap-2">
+    <div className="pt-1 sm:pt-10">
+      <p className="eyebrow fade-up mb-5 hidden items-center gap-2 sm:flex">
         <span aria-hidden className="inline-block h-px w-6 bg-accent" /> Savings circles on Bitcoin Cash
       </p>
       <h1 className="display reveal" aria-label="Nobody holds the pot.">
         <span><span><em className="serif pr-[0.04em] font-normal italic tracking-[-0.02em]">Nobody</em> holds</span></span>
         <span><span>the pot.</span></span>
       </h1>
-      <p className="fade-up mt-6 max-w-[34rem] text-[17px] leading-relaxed text-text-2 sm:text-[19px]" style={{ ['--d' as string]: '200ms' }}>
+      <p className="fade-up mt-4 max-w-[34rem] text-[15.5px] leading-relaxed text-text-2 sm:mt-6 sm:text-[19px]" style={{ ['--d' as string]: '200ms' }}>
         {PITCH}
       </p>
-      <p className="fade-up mt-4 hidden max-w-[34rem] text-[14px] leading-relaxed text-text-2 sm:block" style={{ ['--d' as string]: '260ms' }}>
+      <p className="mt-4 hidden max-w-[34rem] text-[14px] leading-relaxed text-text-2 sm:block">
         Below is a real circle on {net}, read live from the chain through {BRAND_NAME}’s server relay. Its rounds are 10 minutes long so you can watch a whole cycle; real circles use a day or a week.
       </p>
     </div>

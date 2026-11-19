@@ -3,7 +3,7 @@ import type { Snapshot } from '@/lib/torc/snapshot';
 import { hasPaid } from '@/lib/torc/state';
 import { seatName } from '@/lib/app/demo';
 
-const C = 120, R = 100, r = 70, GAP = 7;
+const C = 120, R = 100, r = 68, GAP = 9;
 const pt = (rad: number, deg: number) => [C + rad * Math.cos((deg * Math.PI) / 180), C + rad * Math.sin((deg * Math.PI) / 180)] as const;
 
 /** One seat, drawn like a segment of the Torc mark: the inner edge is turned clockwise, so the ring reads as motion. */
@@ -31,10 +31,10 @@ export function Ring({ snap, names }: { snap: Snapshot; names: string[] }) {
   const statuses = seatStatuses(snap);
   const turn = snap.turnSeat;
   const markerAngle = turn * span + span / 2; // degrees clockwise from top
-  const skew = Math.min(22, span * 0.18);
+  const skew = Math.min(12, span * 0.1);
   const colorOf = (i: number, st: SeatStatus) => (i === turn ? 'var(--turn)' : st === 'due' ? 'var(--due)' : st === 'mempool' ? 'var(--mempool)' : 'var(--confirmed)');
   return (
-    <figure className="relative mx-auto w-full max-w-[460px]" data-testid="ring" data-seats={n} data-turn={turn}>
+    <figure className="relative mx-auto w-full max-w-[250px] sm:max-w-[460px]" data-testid="ring" data-seats={n} data-turn={turn}>
       <svg viewBox="0 0 240 240" className="w-full overflow-visible" role="img" aria-label={`Circle of ${n} seats, round ${snap.state.round}, ${seatName(names, turn)}'s turn`}>
         {/* Instrument bezel: a hairline track and one tick per seat boundary. */}
         <circle cx={C} cy={C} r={R + 9} fill="none" stroke="var(--line)" strokeWidth="1" />
@@ -79,7 +79,7 @@ export function Ring({ snap, names }: { snap: Snapshot; names: string[] }) {
         <text x="120" y="161" textAnchor="middle" className="num" fontSize="8.5" fill="var(--text-2)">{statuses.filter((x) => x !== 'due').length} / {n} paid</text>
       </svg>
       <figcaption className="sr-only">Turn: {seatName(names, turn)}</figcaption>
-      <ul className="mt-5 grid gap-2 text-[13px]" style={{ gridTemplateColumns: `repeat(${Math.min(n, 3)}, minmax(0,1fr))` }}>
+      <ul className="mt-4 grid gap-2 text-[13px] sm:mt-5" style={{ gridTemplateColumns: `repeat(${Math.min(n, 3)}, minmax(0,1fr))` }}>
         {statuses.map((st, i) => (
           <li key={i} className={`flex min-w-0 items-center gap-2 rounded-full border px-2.5 py-1.5 ${i === turn ? 'border-turn' : 'rule'}`} data-testid={`seat-label-${i}`}>
             <span

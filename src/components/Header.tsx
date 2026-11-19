@@ -6,7 +6,7 @@ import { Mark } from './Mark';
 
 export function Header() {
   return (
-    <header className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-4 sm:px-6 sm:py-5">
+    <header className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-5">
       <Link href="/" className="group flex items-center gap-2.5" aria-label={`${BRAND_NAME} home`}>
         <Mark className="size-7 text-accent transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] group-hover:rotate-[72deg]" />
         <span className="text-[19px] font-semibold tracking-[-0.04em]">{BRAND_NAME.toLowerCase()}</span>

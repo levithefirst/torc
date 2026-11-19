@@ -6,6 +6,7 @@ import { BRAND_NAME, PITCH } from '@/brand';
 import { DEMO } from '@/lib/app/demo';
 import { getSnapshot } from '@/lib/server/chain';
 import { DECK_URL, NETWORK, REPO_URL, explorerTx, explorerAddress } from '@/lib/chain/config';
+import { Mark } from '@/components/Mark';
 
 export const metadata = { title: 'Deck' };
 // Re-read the live circle at most every 5 minutes; the rest is fixed at build time.
@@ -44,22 +45,23 @@ function Slide({ n, title, children }: { n: number; title: string; children: Rea
     <section
       data-testid="deck-slide"
       aria-label={`Slide ${n}: ${title}`}
-      className="deck-slide flex min-h-[min(80vh,620px)] flex-col rounded-[var(--radius)] border border-border-subtle bg-surface p-6 sm:p-10"
+      className="deck-slide relative flex min-h-[min(86vh,680px)] scroll-mt-4 flex-col overflow-hidden rounded-[24px] border rule bg-surface p-6 sm:p-12"
     >
-      <div className="mb-5 flex items-baseline justify-between gap-4">
-        <h2 className="text-xl font-semibold tracking-tight sm:text-3xl">{title}</h2>
-        <span className="num text-[12px] text-text-2">{n} / 8</span>
+      <div className="mb-8 flex items-center justify-between gap-4">
+        <span className="eyebrow flex items-center gap-2"><Mark className="size-4 text-accent" /> {BRAND_NAME} · BCH BLAZE 2026</span>
+        <span className="num text-[12px] text-text-2"><span className="text-text">{String(n).padStart(2, '0')}</span> / 08</span>
       </div>
-      <div className="grid flex-1 content-start gap-4 text-[15px] leading-relaxed text-text-2 sm:text-base">{children}</div>
+      <h2 className="mb-8 max-w-4xl text-[clamp(30px,4.6vw,60px)] font-semibold leading-[0.98] tracking-[-0.04em] text-text">{title}</h2>
+      <div className="grid flex-1 content-start gap-5 text-[15px] leading-relaxed text-text-2 sm:text-[17px]">{children}</div>
     </section>
   );
 }
 
 const B = ({ children }: { children: React.ReactNode }) => <b className="font-semibold text-text">{children}</b>;
 const Stat = ({ value, label }: { value: string; label: string }) => (
-  <div className="rounded-[var(--radius)] border border-border-subtle p-3">
-    <div className="num text-2xl font-semibold text-text">{value}</div>
-    <div className="text-[13px] text-text-2">{label}</div>
+  <div className="border-t rule pt-3">
+    <div className="num text-[clamp(22px,2.6vw,34px)] font-medium leading-none tracking-[-0.03em] text-text">{value}</div>
+    <div className="mt-2 text-[13px] leading-snug text-text-2">{label}</div>
   </div>
 );
 
@@ -75,16 +77,16 @@ export default async function Deck() {
   const externalDeck = DECK_URL.startsWith('http');
 
   return (
-    <article className="grid gap-6 py-6" data-testid="deck">
-      <header className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="text-lg font-semibold">{BRAND_NAME} · BCH BLAZE 2026</h1>
+    <article className="grid gap-6 py-4 sm:gap-8" data-testid="deck">
+      <header className="flex flex-wrap items-baseline justify-between gap-2 pt-2">
+        <h1 className="eyebrow">{BRAND_NAME} deck · 8 slides</h1>
         <p className="text-[13px] text-text-2">
-          Use the arrow keys or scroll. {externalDeck && <a className="text-accent-text underline" href={DECK_URL}>Open the Google Slides version</a>}
+          Use the arrow keys or scroll. {externalDeck && <a className="link" href={DECK_URL}>Open the Google Slides version</a>}
         </p>
       </header>
 
       <Slide n={1} title="Savings circles run on trust in one person">
-        <p className="text-lg text-text sm:text-2xl">{PITCH}</p>
+        <p className="serif max-w-3xl text-[clamp(24px,3.2vw,40px)] italic leading-[1.15] text-text">{PITCH}</p>
         <ul className="list-disc space-y-1 pl-5">
           <li>Rotating savings circles are a global habit: <B>tandas</B> in Mexico, <B>hui</B> in China, <B>chit funds</B> in India, <B>susu</B> in Ghana, <B>ajo</B> and <B>esusu</B> in Nigeria, where Torc started. Hundreds of millions of people save this way, often without a bank.</li>
           <li>Every member pays a fixed amount each round. Each round, one member takes the whole pot.</li>
@@ -105,7 +107,7 @@ export default async function Deck() {
         <div className="grid items-center gap-6 sm:grid-cols-[1fr_200px]">
           <div className="grid gap-3">
             <p>
-              <a className="text-xl font-semibold text-accent-text underline" href={SITE}>usetorc.vercel.app</a>
+              <a className="link text-[clamp(22px,3vw,34px)] font-semibold tracking-tight" href={SITE}>usetorc.vercel.app</a>
             </p>
             <p>The page opens on a real circle on {NETWORK === 'mainnet' ? 'BCH mainnet' : NETWORK}. One click on <B>Run the next step live</B> signs and broadcasts its next real transaction (a payment, or the payout) with a demo seat key on the server. No wallet needed.</p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -115,7 +117,7 @@ export default async function Deck() {
             </div>
             <p className="text-[13px]">Production, 10 runs, 19 Nov 2026, measured on the chipnet deployment before the mainnet switch (docs/LATENCY.md). The demo circle uses 10-minute test rounds so a full cycle fits in a visit.</p>
           </div>
-          <div className="mx-auto w-[180px] overflow-hidden rounded bg-[#FBF9F5] p-2" aria-label="QR code for usetorc.vercel.app" dangerouslySetInnerHTML={{ __html: qr }} />
+          <div className="mx-auto w-[180px] overflow-hidden rounded-2xl bg-[#FBF9F5] p-3" aria-label="QR code for usetorc.vercel.app" dangerouslySetInnerHTML={{ __html: qr }} />
         </div>
       </Slide>
 
@@ -133,7 +135,7 @@ export default async function Deck() {
           <Stat value="27 / 14" label="tests / attack cases the covenant must reject" />
         </div>
         <p className="text-[13px]">
-          Source: <a className="text-accent-text underline" href={`${REPO_URL}/blob/main/contracts/TorcCircle.cash`}>contracts/TorcCircle.cash</a> (CashScript 0.14, BCH 2025 opcodes only, so every wallet VM can run it).
+          Source: <a className="link" href={`${REPO_URL}/blob/main/contracts/TorcCircle.cash`}>contracts/TorcCircle.cash</a> (CashScript 0.14, BCH 2025 opcodes only, so every wallet VM can run it).
         </p>
       </Slide>
 
@@ -154,7 +156,7 @@ export default async function Deck() {
       <Slide n={6} title="If someone doesn’t pay">
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <h3 className="mb-1 font-semibold text-text">Today (v1)</h3>
+            <h3 className="eyebrow mb-3">Today (v1)</h3>
             <ul className="list-disc space-y-1 pl-5">
               <li>The payout needs every seat paid, so a missing payment pauses the round. Nobody can take the pot early or run with it.</li>
               <li>Money already paid in stays locked in the covenant until the missing seat pays. There is no deadline, so a late payment still unlocks it.</li>
@@ -163,7 +165,7 @@ export default async function Deck() {
             </ul>
           </div>
           <div>
-            <h3 className="mb-1 font-semibold text-text">v2 design</h3>
+            <h3 className="eyebrow mb-3">v2 design</h3>
             <ul className="list-disc space-y-1 pl-5">
               <li><B>Timeout refund:</B> after the deadline plus a grace period, each member who paid takes their own contribution back with their seat NFT.</li>
               <li><B>Bond:</B> each seat locks a bond on joining and loses it to the members who paid if it misses a round.</li>
@@ -178,8 +180,8 @@ export default async function Deck() {
         {DEMO && NETWORK === 'mainnet' && (
           <p>
             <B>Live on BCH mainnet:</B> the {DEMO.name} (3 seats, 2,000 sats each, 10-minute rounds), seats held by demo keys and driven by the site’s button.{' '}
-            <a className="num text-accent-text underline" href={explorerTx(DEMO.genesisTxid)}>genesis {DEMO.genesisTxid.slice(0, 10)}…</a> ·{' '}
-            <a className="text-accent-text underline" href={explorerAddress(snap?.address ?? DEMO.tokenAddress)}>covenant</a>
+            <a className="num link" href={explorerTx(DEMO.genesisTxid)}>genesis {DEMO.genesisTxid.slice(0, 10)}…</a> ·{' '}
+            <a className="link" href={explorerAddress(snap?.address ?? DEMO.tokenAddress)}>covenant</a>
             {demoPayouts !== null && <> · {demoPayouts} payout{demoPayouts === 1 ? '' : 's'} so far</>}
           </p>
         )}
@@ -193,7 +195,7 @@ export default async function Deck() {
           <p className="mb-1"><B>Real-wallet test</B>, Paytaca browser extension over WizardConnect, 19 Nov 2026: create a circle, then all 3 seats pay.</p>
           <ul className="grid gap-0.5 text-[13px]">
             {WALLET_TEST.map((t) => (
-              <li key={t.txid}>{t.what}: <a className="num text-accent-text underline" href={explorerTx(t.txid, 'chipnet')}>{t.txid.slice(0, 10)}…</a></li>
+              <li key={t.txid}>{t.what}: <a className="num link" href={explorerTx(t.txid, 'chipnet')}>{t.txid.slice(0, 10)}…</a></li>
             ))}
           </ul>
           <p className="mt-1 text-[13px]">The payout from a real wallet and a Selene test are still to do.</p>
@@ -208,7 +210,7 @@ export default async function Deck() {
           <li><B>Ask:</B> a pilot with real circles in PUSD, starting with the ajo groups Torc came from, and intros to wallet teams (Selene, Paytaca) for a native “Circles” tab.</li>
         </ul>
         <p className="mt-auto text-[13px]">
-          Code: <a className="text-accent-text underline" href={REPO_URL}>{REPO_URL.replace('https://', '')}</a> · Live: <a className="text-accent-text underline" href={SITE}>{SITE.replace('https://', '')}</a>
+          Code: <a className="link" href={REPO_URL}>{REPO_URL.replace('https://', '')}</a> · Live: <a className="link" href={SITE}>{SITE.replace('https://', '')}</a>
         </p>
       </Slide>
 
