@@ -79,10 +79,10 @@ XO engine on chipnet.
 [`140817f19a39d8e974d23e57e51d2c9e02edf37729bc18956ca1935b0cca11a8`](https://cbch.loping.net/tx/140817f19a39d8e974d23e57e51d2c9e02edf37729bc18956ca1935b0cca11a8),
 valid in blaze.xo.cash's transaction inspector. Details: [docs/XO.md](XO.md).
 
-Note: eleven later txs of the CLI circle (round 2 onwards, including its claim `32351726…`) are still
-unconfirmed on chipnet at the time of writing, after being rebroadcast to both Electrum servers on 19 Nov. They
-are valid in the servers' mempools; the web demo circle's newer txs confirm normally. The showcase list above
-uses only confirmed txs for that reason.
+Note: the CLI circle's later txs (from the first claim `32351726…` through the round-2 contributions) were
+unconfirmed on the morning of 19 Nov, after a rebroadcast to both Electrum servers. They confirmed later the
+same day at 3:35 PM WAT (block time 14:35 UTC, 139 confirmations at tip height 338,438 when rechecked at
+6:00 PM WAT). The showcase list above still uses the web demo circle, which was confirmed throughout.
 
 ## Still to do by hand (Fluid)
 
