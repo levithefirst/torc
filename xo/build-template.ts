@@ -154,8 +154,8 @@ const template = {
     unlockSeat: '<memberKey.schnorr_signature.all_outputs> <memberKey.public_key>',
   },
   constants: {
-    contributionDust: { ...n('Contribution dust', 'Sats every contribution UTXO carries (enforced by the covenant).', 'coins'), type: 'satoshis', value: '1000' },
-    minerFeeSatoshis: { ...n('Miner fee', 'Fixed fee for a contribute transaction (~1.3 kB at 1 sat/byte).', 'coins'), type: 'satoshis', value: '1600' },
+    contributionDust: { ...n('Contribution dust', 'Sats every contribution UTXO carries (enforced by the covenant).', 'coins'), type: 'satoshis', value: '1000n' },
+    minerFeeSatoshis: { ...n('Miner fee', 'Fixed fee for a contribute transaction (~1.3 kB at 1 sat/byte).', 'coins'), type: 'satoshis', value: '1600n' },
   },
   variables: {
     memberKey: { ...n('Seat key', 'The private key controlling this member’s seat NFT.', 'key'), type: 'private_key' },
