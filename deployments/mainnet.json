@@ -1,0 +1,28 @@
+{
+  "name": "Torc Demo Circle",
+  "network": "mainnet",
+  "params": {
+    "network": "mainnet",
+    "mode": "bch",
+    "contribution": "2000",
+    "seats": 3,
+    "period": 600,
+    "circleCategory": "307955052c2bfa1b71dd3f60fd274a3cb3bf26a667475d945b559e202c9f9924"
+  },
+  "covenantAddress": "bitcoincash:pwjkguw90uewl6hxyfmt7z00uf5vjswtr8sxhaxx69nxh62rf08pcqdllx9a4",
+  "covenantTokenAddress": "bitcoincash:rwjkguw90uewl6hxyfmt7z00uf5vjswtr8sxhaxx69nxh62rf08pcj7r7lyy7",
+  "seatNames": [
+    "Maya",
+    "Kofi",
+    "Diego"
+  ],
+  "seatKeys": [],
+  "genesisTxid": "30aa20143d3ff62f68277725f8c947a9dd530b6f280b7deebae661ff78969077",
+  "events": [
+    {
+      "kind": "genesis",
+      "txid": "30aa20143d3ff62f68277725f8c947a9dd530b6f280b7deebae661ff78969077",
+      "at": "2026-11-19T20:37:45.750Z"
+    }
+  ]
+}
