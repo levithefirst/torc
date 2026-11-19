@@ -8,8 +8,8 @@ import { useWizardConnect, WizardConnectQRDialog } from '@wizardconnect/react';
 import { placeholderP2PKHUnlocker, isPlaceholderUnlocker, type SpendableUtxo, type TransactionBuilder } from 'cashscript';
 import { encodeCashAddress, hash160, binToHex, stringify } from '@bitauth/libauth';
 import { BRAND_NAME, BRAND_SLUG } from '@/brand';
-import { NETWORK, electrumHosts } from '@/lib/chain/config';
-import { wsWithRelayFallback } from '@/lib/chain/electrum';
+import { NETWORK, electrumHosts, BROWSER_WSS } from '@/lib/chain/config';
+import { wsWithRelayFallback, relayCaller } from '@/lib/chain/electrum';
 import { TorcProvider } from '@/lib/chain/provider';
 import { prefixFor } from '@/lib/torc/address';
 import type { WalletSide } from '@/lib/torc/txs';
@@ -18,6 +18,13 @@ export interface HdAddress { path: 'receive' | 'change'; index: number; address:
 
 interface WalletCtx {
   state: string;
+  /**
+   * True after a reload while the stored session is being restored: the wallet's xpubs come
+   * from storage, so addresses and seats show at once, but signing needs the wallet to answer.
+   */
+  restored: boolean;
+  /** connected, or restored from storage: seats can be shown and actions attempted. */
+  ready: boolean;
   walletName: string | null;
   error: string | null;
   connect: () => void;
@@ -46,7 +53,12 @@ const CHILD = { receive: 0, change: 1 } as const;
 export function WalletProvider({ children }: { children: React.ReactNode }) {
   const icon = typeof window !== 'undefined' ? `${window.location.origin}/apple-icon` : undefined;
   const wc = useWizardConnect({ dappName: BRAND_NAME, dappIcon: icon, sessionKey: `${BRAND_SLUG}-wizardconnect` });
-  const provider = useMemo(() => new TorcProvider(wsWithRelayFallback(electrumHosts(), typeof window !== 'undefined' ? window.location.origin : '', 8000), NETWORK), []);
+  // Chain reads and broadcasts go through the site's HTTPS relay (no blocked-WebSocket noise);
+  // NEXT_PUBLIC_BROWSER_WSS=1 restores the direct Electrum WebSocket with the relay as fallback.
+  const provider = useMemo(() => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    return new TorcProvider(BROWSER_WSS ? wsWithRelayFallback(electrumHosts(), origin, 8000) : relayCaller(origin), NETWORK);
+  }, []);
   const [addresses, setAddresses] = useState<HdAddress[]>([]);
   const [utxos, setUtxos] = useState<SpendableUtxo[]>([]);
   const [scanning, setScanning] = useState(false);
@@ -82,13 +94,21 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     }
   }, [wc.manager, provider]);
 
+  // Why a reload used to lose the wallet: on restore, @wizardconnect/react sits in 'connecting'
+  // until the wallet answers dapp_ready with wallet_ready, and some wallets (the Paytaca
+  // extension in our test) never answer a restored session. The manager has already restored
+  // the wallet's xpubs from storage though, so we can derive addresses and show seats now, and
+  // a sign request still reaches the wallet if it is listening (pending requests are re-sent
+  // when its wallet_ready does arrive). If it is not, the request times out with a clear message.
+  const restored = (wc.state === 'connecting' || wc.state === 'reconnecting') && !wc.uri && !!wc.manager?.hasPath(CHILD.receive);
+  const ready = (wc.state === 'connected' && !!wc.manager) || restored;
   useEffect(() => {
-    if (wc.state === 'connected' && wc.manager) {
-      setShowQr(false);
+    if (ready && wc.manager) {
+      if (wc.state === 'connected') setShowQr(false);
       rescan();
     }
     if (wc.state === 'disconnected' || wc.state === 'idle') { setAddresses([]); setUtxos([]); }
-  }, [wc.state, wc.manager, rescan]);
+  }, [ready, wc.state, wc.manager, rescan]);
 
   const byLock = useMemo(() => new Map(addresses.map((a) => [a.lockingHex, a])), [addresses]);
 
@@ -118,7 +138,12 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     // The transaction itself goes as hex (Paytaca decodes `transaction` with hexToBin; hex is
     // valid per @bch-wc2/interfaces for every wallet).
     const relaySafe = { ...JSON.parse(stringify(transaction)), transaction: builder.build() };
-    const res = await m.signTransaction({ transaction: relaySafe as never, inputPaths });
+    // A restored session may have no wallet on the other end: give up after 60 s.
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(new Error('Your wallet did not answer. Open it, or tap "pair again" and scan once more.')), 60_000);
+    const res = await m.signTransaction({ transaction: relaySafe as never, inputPaths }, { signal: ac.signal })
+      .catch((e: unknown) => { throw new Error((e as Error)?.message || 'Signing was cancelled'); })
+      .finally(() => clearTimeout(timer));
     if (res.error || !res.signedTransaction) throw new Error(res.error || 'wallet returned no signature');
     const txid = await provider.sendRawTransaction(res.signedTransaction);
     setTimeout(rescan, 1500);
@@ -141,7 +166,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   }, [repair, wc]);
 
   const value: WalletCtx = {
-    state: wc.state, walletName: wc.walletName, error: wc.error, connect, disconnect: wc.disconnect,
+    state: wc.state, restored, ready, walletName: wc.walletName, error: wc.error, connect, disconnect: wc.disconnect,
     addresses, utxos, scanning, rescan, provider, walletSide, signAndSend,
   };
   return (
@@ -164,6 +189,14 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
 export function ConnectButton() {
   const w = useWallet();
+  if (w.restored)
+    return (
+      <div className="flex flex-wrap items-center gap-2 text-sm" data-testid="wallet-restored">
+        <span className="text-text-2">Session restored{w.walletName ? ` with ${w.walletName}` : ''}{w.scanning ? ' · scanning…' : ` · ${w.utxos.length} coins`}. Keep your wallet open to sign.</span>
+        <button onClick={w.connect} className="rounded border border-border px-2 py-1 text-[12px]">Pair again</button>
+        <button onClick={() => w.disconnect()} className="rounded border border-border px-2 py-1 text-[12px]">Disconnect</button>
+      </div>
+    );
   if (w.state === 'connected')
     return (
       <div className="flex flex-wrap items-center gap-2 text-sm" data-testid="wallet-connected">

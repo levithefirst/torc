@@ -6,8 +6,9 @@ import { useWallet, ConnectButton } from '@/lib/wallet/WalletProvider';
 import { buildGenesis, buildPrepare, pickGenesisInput } from '@/lib/torc/txs';
 import { isValidAddress } from '@/lib/torc/address';
 import type { AssetMode } from '@/lib/torc/circle';
-import { NETWORK, explorerTx } from '@/lib/chain/config';
-import { PUSD_MAINNET, shortTx } from '@/lib/app/demo';
+import { NETWORK } from '@/lib/chain/config';
+import { TxLink } from './TxLink';
+import { PUSD_MAINNET } from '@/lib/app/demo';
 import chipnetAsset from '../../deployments/chipnet-asset.json' with { type: 'json' };
 import { BRAND_NAME } from '@/brand';
 import { encodeCashAddress } from '@bitauth/libauth';
@@ -109,7 +110,7 @@ function Form() {
         <fieldset className="grid gap-2">
           <legend className="mb-1 flex items-center gap-3 text-sm font-semibold">
             Member addresses, in payout order
-            {w.state === 'connected' && <button type="button" onClick={fillMine} className="rounded border border-border px-2 py-0.5 text-[12px] font-normal">Use my address for every seat</button>}
+            {w.ready && <button type="button" onClick={fillMine} className="rounded border border-border px-2 py-0.5 text-[12px] font-normal">Use my address for every seat</button>}
           </legend>
           {Array.from({ length: seats }, (_, i) => (
             <input key={i} className={`${input} num`} placeholder={`${NETWORK === 'mainnet' ? 'bitcoincash' : 'bchtest'}:… seat ${i + 1}`} value={members[i]} onChange={(e) => setMembers(members.map((m, j) => (j === i ? e.target.value : m)))} aria-label={`Seat ${i + 1} address`} />
@@ -136,14 +137,14 @@ function Form() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <ConnectButton />
-          <button type="button" disabled={!valid || w.state !== 'connected' || !!busy} onClick={create} className={`rounded-[var(--radius)] px-4 py-2 text-sm font-semibold disabled:opacity-60 ${w.state === 'connected' ? 'bg-accent text-on-accent' : 'border border-border text-text-2'}`} data-testid="btn-create">
+          <button type="button" disabled={!valid || !w.ready || !!busy} onClick={create} className={`rounded-[var(--radius)] px-4 py-2 text-sm font-semibold disabled:opacity-60 ${w.ready ? 'bg-accent text-on-accent' : 'border border-border text-text-2'}`} data-testid="btn-create">
             {busy ? 'Check your wallet…' : 'Create circle'}
           </button>
           <button type="button" onClick={dryRun} className="rounded-[var(--radius)] border border-border px-4 py-2 text-sm" data-testid="btn-dry-run">Dry run (no wallet)</button>
         </div>
         {msg && (
           <p className={`text-sm ${msg.error ? 'text-danger' : 'text-text-2'}`} data-testid="create-msg">
-            {msg.text} {msg.txid && <a className="num text-accent-text underline" href={explorerTx(msg.txid)} target="_blank" rel="noopener noreferrer">{shortTx(msg.txid)}</a>}
+            {msg.text} {msg.txid && <TxLink txid={msg.txid} />}
           </p>
         )}
         {dry && (
