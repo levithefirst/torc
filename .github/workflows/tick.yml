@@ -13,4 +13,4 @@ jobs:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           if [ -z "$CRON_SECRET" ]; then echo "CRON_SECRET not set; skipping"; exit 0; fi
-          curl -sS -m 40 -H "Authorization: Bearer $CRON_SECRET" https://torc-brown.vercel.app/api/demo/tick || true
+          curl -sS -m 40 -H "Authorization: Bearer $CRON_SECRET" https://torc-cash.vercel.app/api/demo/tick || true

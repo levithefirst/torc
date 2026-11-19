@@ -4,13 +4,13 @@ import { SignatureTemplate } from 'cashscript';
 import type { TorcProvider } from '../chain/provider';
 import { circleContract, type CircleParams } from './circle';
 import { buildContribute, buildClaim, findState, memberNfts, type WalletSide } from './txs';
-import { decodeState, nextAction, type CircleState } from './state';
+import { decodeState, nextAction, fullMask, type CircleState } from './state';
 import { keyInfo } from './keys';
 
 export interface SeatSigner { privateKey: Uint8Array }
 
 export type TickResult =
-  | { ok: true; kind: 'contribute' | 'claim'; seat: number; txid: string; round: number }
+  | { ok: true; kind: 'contribute' | 'claim'; seat: number; txid: string; round: number; amount: string; claimNext: boolean }
   | { ok: false; reason: 'wait'; seconds: number; message: string }
   | { ok: false; reason: 'finished' | 'no-seat-key' | 'error'; message: string };
 
@@ -40,7 +40,9 @@ export async function tick(provider: TorcProvider, params: CircleParams, seats: 
         if (next.kind === 'contribute') {
           const { builder } = buildContribute({ provider, params, contract, contractUtxos: utxos, wallet: holder.wallet, memberNft });
           const tx = await builder.send();
-          return { ok: true, kind: 'contribute', seat: next.seat, txid: tx.txid, round: state.round };
+          // Did this payment complete the round? Then the payout is the next step.
+          const claimNext = (state.paidMask | (1 << next.seat)) === fullMask(params.seats);
+          return { ok: true, kind: 'contribute', seat: next.seat, txid: tx.txid, round: state.round, amount: params.contribution.toString(), claimNext };
         }
         const { mtp } = await provider.medianTimePast();
         // Consensus: a timestamp locktime must be strictly below the tip's median-time-past.
@@ -51,7 +53,7 @@ export async function tick(provider: TorcProvider, params: CircleParams, seats: 
         }
         const { builder } = buildClaim({ provider, params, contract, contractUtxos: utxos, wallet: holder.wallet, memberNft, locktime });
         const tx = await builder.send();
-        return { ok: true, kind: 'claim', seat: next.seat, txid: tx.txid, round: state.round };
+        return { ok: true, kind: 'claim', seat: next.seat, txid: tx.txid, round: state.round, amount: (params.contribution * BigInt(params.seats)).toString(), claimNext: false };
       }
     }
     return { ok: false, reason: 'no-seat-key', message: `Seat ${next.seat} is not held by a demo key (it may have been transferred).` };
