@@ -15,27 +15,32 @@ export function electrumHosts(network: TorcNetwork = NETWORK): string[] {
   return DEFAULT_ELECTRUM[network];
 }
 
-// Explorers per network. The primary is the one we have seen up most reliably; the fallback is
-// shown next to it so a dead explorer never leaves a judge without a way to check a tx.
-const DEFAULT_EXPLORER: Record<TorcNetwork, { tx: string; address: string; name: string }> = {
-  chipnet: { tx: 'https://cbch.loping.net/tx/', address: 'https://cbch.loping.net/address/', name: 'cbch.loping.net' },
-  mainnet: { tx: 'https://explorer.bitcoinunlimited.info/tx/', address: 'https://explorer.bitcoinunlimited.info/address/', name: 'explorer.bitcoinunlimited.info' },
+// Explorers per network ({id} = txid or address). Chosen by what actually loaded on 19 Nov 2026:
+// chipnet: explorer.selene.cash loads every Torc chipnet tx (cbch.loping.net could not load them and
+// chipnet.imaginary.cash refused connections); mainnet: 3xpl loads for everyone, while
+// explorer.bitcoinunlimited.info shows a Cloudflare check to some visitors, so it is the alt.
+interface Explorer { name: string; tx: string; address: string; stripPrefix?: boolean }
+const PRIMARY: Record<TorcNetwork, Explorer> = {
+  chipnet: { name: 'explorer.selene.cash', tx: 'https://explorer.selene.cash/tx/{id}?network=chipnet', address: 'https://explorer.selene.cash/address/{id}?network=chipnet' },
+  mainnet: { name: '3xpl.com', tx: 'https://3xpl.com/bitcoin-cash/transaction/{id}', address: 'https://3xpl.com/bitcoin-cash/address/{id}', stripPrefix: true },
 };
-const FALLBACK_EXPLORER: Record<TorcNetwork, { tx: string; name: string }> = {
-  chipnet: { tx: 'https://chipnet.imaginary.cash/tx/', name: 'chipnet.imaginary.cash' },
-  mainnet: { tx: 'https://3xpl.com/bitcoin-cash/transaction/', name: '3xpl.com' },
+const ALT: Record<TorcNetwork, Explorer> = {
+  chipnet: { name: 'cbch.loping.net', tx: 'https://cbch.loping.net/tx/{id}', address: 'https://cbch.loping.net/address/{id}' },
+  mainnet: { name: 'explorer.bitcoinunlimited.info', tx: 'https://explorer.bitcoinunlimited.info/tx/{id}', address: 'https://explorer.bitcoinunlimited.info/address/{id}' },
 };
+const fill = (tpl: string, id: string) => tpl.replace('{id}', id);
 export function explorerTx(txid: string, network: TorcNetwork = NETWORK): string {
-  const base = (network === NETWORK && process.env.NEXT_PUBLIC_EXPLORER_TX) || DEFAULT_EXPLORER[network].tx;
-  return base + txid;
+  const env = network === NETWORK ? process.env.NEXT_PUBLIC_EXPLORER_TX : undefined;
+  return env ? env + txid : fill(PRIMARY[network].tx, txid);
 }
 /** A second explorer for the same tx, for when the primary is down. */
 export function explorerTxAlt(txid: string, network: TorcNetwork = NETWORK): string {
-  return FALLBACK_EXPLORER[network].tx + txid;
+  return fill(ALT[network].tx, txid);
 }
-export const explorerAltName = (network: TorcNetwork = NETWORK) => FALLBACK_EXPLORER[network].name;
+export const explorerAltName = (network: TorcNetwork = NETWORK) => ALT[network].name;
 export function explorerAddress(address: string, network: TorcNetwork = NETWORK): string {
-  return DEFAULT_EXPLORER[network].address + address;
+  const e = PRIMARY[network];
+  return fill(e.address, e.stripPrefix ? address.replace(/^[a-z]+:/, '') : address);
 }
 
 /**

@@ -7,7 +7,7 @@ round's contribution into the TorcCircle covenant, and the covenant checks it th
 
 | | |
 |---|---|
-| Contribute tx (XO engine, invitation flow) | [`140817f19a39d8e974d23e57e51d2c9e02edf37729bc18956ca1935b0cca11a8`](https://cbch.loping.net/tx/140817f19a39d8e974d23e57e51d2c9e02edf37729bc18956ca1935b0cca11a8) (confirmed, 1,127 bytes) |
+| Contribute tx (XO engine, invitation flow) | [`140817f19a39d8e974d23e57e51d2c9e02edf37729bc18956ca1935b0cca11a8`](https://explorer.selene.cash/tx/140817f19a39d8e974d23e57e51d2c9e02edf37729bc18956ca1935b0cca11a8?network=chipnet) (confirmed, 1,127 bytes) |
 | Invitation | `d3922d7fdb7e33113ea8deb34281e0ac`, exported to [`xo/runs/d3922d7fdb7e33113ea8deb34281e0ac.invitation.json`](../xo/runs/d3922d7fdb7e33113ea8deb34281e0ac.invitation.json) |
 | Template identifier | `3c611f6c18000ae220669532b1c44003fd570cf0abd540bf4b6d436b097b5795` |
 | Circle | "XO Circle", `deployments/chipnet-xo.json`: 3 seats, 0.10 tPUSD, seat 2 ("Yemi") held by the XO wallet |

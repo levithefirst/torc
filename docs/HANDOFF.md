@@ -38,7 +38,13 @@ Everything is built and tested; mainnet is switched on by env alone. When Fluid 
 5. Optional, also 🔒: to run a PUSD circle instead of BCH mode, get ~1 PUSD into the same throwaway address
    (Claude Code never buys PUSD). Then use `--mode token --contribution 10` (= 0.10 PUSD).
 
-## 4. ⏳ Real wallet test on the Pixel 7 (chipnet)
+## 4. Real wallet test (chipnet)
+Done on 19 Nov 2026 with the Paytaca browser extension: create + all 3 seats paid (txids in README "Wallets",
+viewable on https://explorer.selene.cash with `?network=chipnet`). Selene is still untested. Note: production
+(torc-cash.vercel.app) is now **mainnet**, so a chipnet re-test needs a chipnet build (`npm run dev`, which
+defaults to chipnet) and the steps below on localhost; on mainnet the same steps spend real sats.
+
+Steps (Selene, Pixel 7):
 1. Install Selene (selene.cash) on the Pixel. Settings → network → Chipnet. Get test coins: open
    https://chipnet.bch.ninja, paste Selene's receive address, request 100,000 sats.
 2. On the phone open https://torc-cash.vercel.app/new → **Connect wallet** → in Selene scan or open the

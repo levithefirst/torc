@@ -24,7 +24,8 @@ describe('mainnet path (env switch only)', () => {
     expect(c.tokenAddress).toMatch(/^bitcoincash:r/);
     expect(keyInfo(generatePrivateKey(), 'mainnet').tokenAddress).toMatch(/^bitcoincash:z/);
     expect(electrumHosts('mainnet')).toContain('bch.imaginary.cash');
-    expect(explorerTx('00'.repeat(32), 'mainnet')).toMatch(/^https:\/\/explorer\.bitcoinunlimited\.info\/tx\//);
+    expect(explorerTx('00'.repeat(32), 'mainnet')).toMatch(/^https:\/\/3xpl\.com\/bitcoin-cash\/transaction\/0{64}$/);
+    expect(explorerTx('00'.repeat(32), 'chipnet')).toMatch(/^https:\/\/explorer\.selene\.cash\/tx\/0{64}\?network=chipnet$/);
   });
 
   it('runs a 0.10 PUSD, 3-seat round on a mainnet-prefixed mock chain', async () => {

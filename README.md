@@ -122,7 +122,7 @@ See [docs/DEPLOYMENTS.md](docs/DEPLOYMENTS.md) (generated from `deployments/*.js
 - **tPUSD** (chipnet test asset, 2 decimals like PUSD): `fb9175ea28b49f530d1e21d521f52c91cf52db90c07af4c5bffbb85fcbb725d4`.
 - **Mainnet (live on https://torc-cash.vercel.app):** "Torc Demo Circle" (`deployments/mainnet.json`), 3 seats
   (Maya, Kofi, Diego), 2,000 sats each, 600 s test rounds, genesis
-  [`30aa2014…`](https://explorer.bitcoinunlimited.info/tx/30aa20143d3ff62f68277725f8c947a9dd530b6f280b7deebae661ff78969077).
+  [`30aa2014…`](https://3xpl.com/bitcoin-cash/transaction/30aa20143d3ff62f68277725f8c947a9dd530b6f280b7deebae661ff78969077).
   The network switches by env alone (`NEXT_PUBLIC_NETWORK=mainnet`, `NETWORK=mainnet` for scripts).
 
 ## How a judge makes a useful mainnet transaction
@@ -146,7 +146,7 @@ builds the transaction with placeholder P2PKH unlockers, and asks the wallet to 
 
 | Wallet | Status |
 |---|---|
-| Paytaca (browser extension, WizardConnect) | **Tested end to end on chipnet, 19 Nov 2026:** created a 3-seat BCH circle (2,000 sats, 10-minute test rounds), then all three seats paid in from the wallet. Txids: create [`a512ff9c…`](https://cbch.loping.net/tx/a512ff9c80783b14a1fdbdf8ea7f7e65d6ef223463fec8a9a29fe1309fb936bf), seat 1 [`26ea2d72…`](https://cbch.loping.net/tx/26ea2d72f1afbb105bafb99da2be3b100107722eeabec13298ae0e993ab285e0), seat 3 [`e32be41d…`](https://cbch.loping.net/tx/e32be41d17d2a82a595df90d4552e6e1519e261c8312391b3025936f4d94f2ea), seat 2 [`ffe74822…`](https://cbch.loping.net/tx/ffe74822eed7fe29996a155cf9bb817da50e3d67b832913898a3f8f999980aa3). Not yet tested from a wallet: claim() and seat transfer (both covered by contract tests and done on chipnet with CLI keys). The test found four wallet-path bugs, all fixed. |
+| Paytaca (browser extension, WizardConnect) | **Tested end to end on chipnet, 19 Nov 2026:** created a 3-seat BCH circle (2,000 sats, 10-minute test rounds), then all three seats paid in from the wallet. Txids: create [`a512ff9c…`](https://explorer.selene.cash/tx/a512ff9c80783b14a1fdbdf8ea7f7e65d6ef223463fec8a9a29fe1309fb936bf?network=chipnet), seat 1 [`26ea2d72…`](https://explorer.selene.cash/tx/26ea2d72f1afbb105bafb99da2be3b100107722eeabec13298ae0e993ab285e0?network=chipnet), seat 3 [`e32be41d…`](https://explorer.selene.cash/tx/e32be41d17d2a82a595df90d4552e6e1519e261c8312391b3025936f4d94f2ea?network=chipnet), seat 2 [`ffe74822…`](https://explorer.selene.cash/tx/ffe74822eed7fe29996a155cf9bb817da50e3d67b832913898a3f8f999980aa3?network=chipnet). Not yet tested from a wallet: claim() and seat transfer (both covered by contract tests and done on chipnet with CLI keys). The test found four wallet-path bugs, all fixed. |
 | Selene (WizardConnect) | Built against the package types; **not yet tested** on a real device |
 | Cashonize | BCH WalletConnect v2 path not built (next) |
 | Automated | Wallet-free dry run + Playwright judge spec |

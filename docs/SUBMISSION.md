@@ -69,14 +69,14 @@ XO engine on chipnet.
 ## Showcase transactions (chipnet, all confirmed)
 
 1. **Genesis** of the web demo circle: mints the state NFT into the covenant and one member NFT per seat.
-   [`2111a3201b391b1a3e7aadb0b81b5774a8df09a31578d2aa09cbb07a545869cb`](https://chipnet.imaginary.cash/tx/2111a3201b391b1a3e7aadb0b81b5774a8df09a31578d2aa09cbb07a545869cb) (block 337111)
+   [`2111a3201b391b1a3e7aadb0b81b5774a8df09a31578d2aa09cbb07a545869cb`](https://explorer.selene.cash/tx/2111a3201b391b1a3e7aadb0b81b5774a8df09a31578d2aa09cbb07a545869cb?network=chipnet) (block 337111)
 2. **Contribution**, shown SEEN 0-conf on the site and then confirmed:
-   [`25e67db027e0a3c5e34e3bd7df56de0552c090e019247816b5308abefe48ae9a`](https://chipnet.imaginary.cash/tx/25e67db027e0a3c5e34e3bd7df56de0552c090e019247816b5308abefe48ae9a) (block 338292)
+   [`25e67db027e0a3c5e34e3bd7df56de0552c090e019247816b5308abefe48ae9a`](https://explorer.selene.cash/tx/25e67db027e0a3c5e34e3bd7df56de0552c090e019247816b5308abefe48ae9a?network=chipnet) (block 338292)
 3. **Claim**: three pooled contributions paid to the turn seat's holder, round advanced:
-   [`f9a927bc0ff6b68c8b0e52900e58b86a783826fe0bed65c972198a12e2703ccc`](https://chipnet.imaginary.cash/tx/f9a927bc0ff6b68c8b0e52900e58b86a783826fe0bed65c972198a12e2703ccc) (block 338292)
+   [`f9a927bc0ff6b68c8b0e52900e58b86a783826fe0bed65c972198a12e2703ccc`](https://explorer.selene.cash/tx/f9a927bc0ff6b68c8b0e52900e58b86a783826fe0bed65c972198a12e2703ccc?network=chipnet) (block 338292)
 
 **XO:** contribution through the XO engine
-[`140817f19a39d8e974d23e57e51d2c9e02edf37729bc18956ca1935b0cca11a8`](https://cbch.loping.net/tx/140817f19a39d8e974d23e57e51d2c9e02edf37729bc18956ca1935b0cca11a8),
+[`140817f19a39d8e974d23e57e51d2c9e02edf37729bc18956ca1935b0cca11a8`](https://explorer.selene.cash/tx/140817f19a39d8e974d23e57e51d2c9e02edf37729bc18956ca1935b0cca11a8?network=chipnet),
 valid in blaze.xo.cash's transaction inspector. Details: [docs/XO.md](XO.md).
 
 Note: the CLI circle's later txs (from the first claim `32351726…` through the round-2 contributions) were
