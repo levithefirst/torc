@@ -10,7 +10,8 @@
   --accent-text:#7A510B; --focus:#1A1711;
   --success:#287C42; --warning:#B35713; --danger:#C2272D;
   --turn:#7A510B; --confirmed:#287C42; --mempool:#196EA9; --due:#5F5A53;
-  --radius:10px; --font-sans:var(--font-geist-sans),"Inter",system-ui,sans-serif; --font-mono:var(--font-geist-mono),ui-monospace,monospace;
+  --radius:10px; --font-sans:var(--font-geist-sans),"Inter",system-ui,sans-serif; --font-mono:var(--font-geist-mono),ui-monospace,monospace; --font-serif:var(--font-instrument),"Instrument Serif",Georgia,serif;
+  --line:#E1DDD7; --ink-band:#1A1711; --on-ink-band:#F6F3EF;
 }
 .dark {
   --bg:#100E0B; --surface:#191714; --surface-2:#22201C;
@@ -20,6 +21,7 @@
   --accent-text:#CFA354; --focus:#CFA354;
   --success:#76CF8A; --warning:#F2985F; --danger:#F97770;
   --turn:#CFA354; --confirmed:#76CF8A; --mempool:#7FBEF3; --due:#AEAAA3;
+  --line:#24211D; --ink-band:#F6F3EF; --on-ink-band:#100E0B;
 }
 
 @theme inline {
@@ -30,14 +32,47 @@
   --color-accent-text: var(--accent-text); --color-focus: var(--focus);
   --color-success: var(--success); --color-warning: var(--warning); --color-danger: var(--danger);
   --color-turn: var(--turn); --color-confirmed: var(--confirmed); --color-mempool: var(--mempool); --color-due: var(--due);
-  --font-sans: var(--font-sans); --font-mono: var(--font-mono);
+  --font-sans: var(--font-sans); --font-mono: var(--font-mono); --font-serif: var(--font-serif);
+  --color-line: var(--line);
 }
 
 html { background: var(--bg); color: var(--text); }
 body { background: var(--bg); color: var(--text); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.serif { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.01em; }
+.display { font-size: clamp(44px, 9.2vw, 112px); line-height: 0.94; letter-spacing: -0.045em; font-weight: 600; }
+.eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-2); }
+.rule { border-color: var(--line); }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; border-radius:999px; font-weight:600; transition: transform 160ms cubic-bezier(.22,1,.36,1), background-color 160ms, border-color 160ms, color 160ms; }
+.btn:active:not(:disabled) { transform: scale(.98); }
+.btn-gold { background: var(--accent); color: var(--on-accent); }
+.btn-gold:hover:not(:disabled) { background: var(--accent-hover); }
+html:not(.dark) .btn-gold { box-shadow: inset 0 0 0 1px var(--text); }
+.btn-ghost { border:1px solid var(--border); color: var(--text); }
+.btn-ghost:hover:not(:disabled) { border-color: var(--text); }
+.link { color: var(--accent-text); text-decoration-line: underline; text-decoration-color: color-mix(in srgb, var(--accent-text) 40%, transparent); text-underline-offset: 3px; transition: text-decoration-color 160ms; }
+.link:hover { text-decoration-color: currentColor; }
+.grid-lines { background-image: linear-gradient(to right, var(--line) 1px, transparent 1px); background-size: calc(100% / 12) 100%; }
+
+/* Line-mask headline reveal (CSS only). */
+.reveal > span { display:block; overflow:hidden; padding-bottom: .06em; }
+.reveal > span > span { display:block; animation: rise 820ms cubic-bezier(.22,1,.36,1) both; }
+.reveal > span:nth-child(2) > span { animation-delay: 70ms; }
+.reveal > span:nth-child(3) > span { animation-delay: 140ms; }
+@keyframes rise { from { transform: translateY(105%); } to { transform: none; } }
+@keyframes fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.fade-up { animation: fade-up 700ms cubic-bezier(.22,1,.36,1) both; animation-delay: var(--d, 0ms); }
+@keyframes seg-in { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
+.seg { transform-box: view-box; transform-origin: 120px 120px; animation: seg-in 700ms cubic-bezier(.22,1,.36,1) both; }
+@keyframes turn-breathe { 0%,100% { opacity: 1; } 50% { opacity: .72; } }
+.turn-breathe { animation: turn-breathe 2.8s ease-in-out infinite; }
+@keyframes land { 0% { opacity: 0; transform: translateY(10px) scale(.985); } 100% { opacity: 1; transform: none; } }
+.land { animation: land 600ms cubic-bezier(.22,1,.36,1) both; }
+
 @media (prefers-reduced-motion: reduce) {
+  .reveal > span > span, .fade-up, .seg, .land { animation: none !important; }
+  .turn-breathe { animation: none !important; }
   *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 }
 

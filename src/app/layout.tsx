@@ -1,11 +1,15 @@
 import type { Metadata, Viewport } from 'next';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
+import { Instrument_Serif } from 'next/font/google';
 import './globals.css';
 import { BRAND_NAME, TAGLINE } from '@/brand';
 import { Banner } from '@/components/Banner';
 import { Header } from '@/components/Header';
 import { WalletProvider } from '@/lib/wallet/WalletProvider';
+import { Footer } from '@/components/Footer';
+
+const serif = Instrument_Serif({ subsets: ['latin'], weight: '400', style: ['normal', 'italic'], variable: '--font-instrument', display: 'swap' });
 
 export const metadata: Metadata = {
   title: { default: `${BRAND_NAME}: rotating savings on Bitcoin Cash`, template: `%s · ${BRAND_NAME}` },
@@ -22,7 +26,7 @@ const themeScript = `try{var t=localStorage.getItem('torc-theme');if(t==='light'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`dark ${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`dark ${GeistSans.variable} ${GeistMono.variable} ${serif.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
@@ -31,8 +35,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         {/* One wallet session for the whole app, so it survives client navigation (e.g. /new -> /circle). */}
         <WalletProvider>
-          <main className="mx-auto max-w-5xl px-4 pb-16">{children}</main>
+          <main className="mx-auto max-w-6xl px-5 pb-10 sm:px-6">{children}</main>
         </WalletProvider>
+        <Footer />
       </body>
     </html>
   );
