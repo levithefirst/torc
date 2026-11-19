@@ -3,11 +3,11 @@
 # against production, spaced past the demo tick's 60 s cooldown. Appends to test-results/latency-runs.jsonl.
 set -u
 BASE_URL="${BASE_URL:-https://torc-brown.vercel.app}"
-OUT=test-results/latency-runs.jsonl
-mkdir -p test-results
+OUT=${OUT:-docs/runs/latency-runs.jsonl}
+mkdir -p "$(dirname "$OUT")" "${LOGDIR:-/tmp}"
 for i in $(seq 1 "${RUNS:-10}"); do
   rm -f test-results/judge-timings.jsonl
-  WS_BLOCKED=1 BASE_URL="$BASE_URL" npx playwright test --project=desktop -g "^(2|3)\." --reporter=line > "test-results/latency-run-$i.log" 2>&1
+  WS_BLOCKED=1 BASE_URL="$BASE_URL" npx playwright test --project=desktop -g "live circle from the chain|Run the next step live" --reporter=line > "${LOGDIR:-/tmp}/latency-run-$i.log" 2>&1
   status=$?
   python3 - "$i" "$status" >> "$OUT" <<'PY'
 import json, sys
