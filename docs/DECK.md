@@ -20,7 +20,7 @@ from `docs/metrics.json`, `docs/LATENCY.md` and the demo circle on chain). This 
 ## 4. How the covenant works
 - State NFT in the covenant: round, round start, paid bitmask. Member NFT per seat: whoever holds it is that seat.
 - contribute(): sets your bit, locks exactly one contribution. claim(): everyone paid + period passed → whole pot to the turn seat's own address.
-- No admin key, no upgrade path, parameters fixed at creation. 24 tests, 14 of them attack cases the covenant must reject.
+- No admin key, no upgrade path, parameters fixed at creation. 27 tests, 14 of them attack cases the covenant must reject.
 
 ## 5. Why Bitcoin Cash
 - Native tokens (CashTokens) for seats, state and the dollar (PUSD): no bridges, no wrapped assets.

@@ -72,7 +72,8 @@ async function run(isCron: boolean) {
     if ((await unconfirmedCovenantTxs()) >= MAX_UNCONFIRMED)
       return NextResponse.json({ ok: false, reason: 'wait', seconds: 60, message: 'A full round is waiting for the next block. Try again after it is mined.' }, { status: 429 });
   } catch {
-    // Mempool read failed: fall through; tick() reads the chain itself and the covenant still rules.
+    // Mempool read failed: fail closed so the shared limit can't be bypassed.
+    return NextResponse.json({ ok: false, reason: 'wait', seconds: 30, message: 'Could not read the chain right now. Try again in a moment.' }, { status: 503 });
   }
   const t0 = Date.now();
   const p = tick(serverProvider, DEMO.params, keys, isCron ? { holdClaimSeconds: CRON_HOLD_CLAIM_S } : {});

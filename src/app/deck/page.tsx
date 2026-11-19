@@ -130,7 +130,7 @@ export default async function Deck() {
           <Stat value={`${t3.redeemScriptBytes} B`} label="covenant script" />
           <Stat value={`${t3.contributeTxBytes.toLocaleString('en-US')} B`} label="contribute tx" />
           <Stat value={`${t3.claimTxBytes.toLocaleString('en-US')} B`} label="claim tx, 3 seats" />
-          <Stat value="24 / 14" label="tests / attack cases the covenant must reject" />
+          <Stat value="27 / 14" label="tests / attack cases the covenant must reject" />
         </div>
         <p className="text-[13px]">
           Source: <a className="text-accent-text underline" href={`${REPO_URL}/blob/main/contracts/TorcCircle.cash`}>contracts/TorcCircle.cash</a> (CashScript 0.14, BCH 2025 opcodes only, so every wallet VM can run it).

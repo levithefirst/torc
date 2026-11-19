@@ -7,7 +7,7 @@ writing the XO feedback are Fluid's steps (see "Still to do by hand").
 
 | Item | State |
 |---|---|
-| Covenant + 14 attack tests (24 tests in all), contract and unit tests green | Done (`npm test`, CI) |
+| Covenant + 14 attack tests (27 tests in all), contract and unit tests green | Done (`npm test`, CI) |
 | Chipnet web demo circle, CLI circle (2 rounds + seat transfer), XO circle | Done (docs/DEPLOYMENTS.md, docs/XO.md) |
 | Live app on Vercel: judge mode, member view, /new, /deck, banner on every page | Done: https://torc-cash.vercel.app |
 | Judge spec 14/14 on production, incl. test 7 (Electrum down) | Done (docs/JUDGE-SPEC.md) |
@@ -52,7 +52,7 @@ It costs about a quarter of a cent per contribution and about a cent and a half 
 
 Judges can try it in ten seconds with no wallet: the home page reads a live circle from the chain, and "Run the
 next step live" broadcasts a real transaction you watch arrive as SEEN 0-conf in about 2.4 seconds. With a
-wallet, /new creates your own circle over WizardConnect. The covenant has fourteen attack tests (24 tests in all).
+wallet, /new creates your own circle over WizardConnect. The covenant has fourteen attack tests (27 tests in all).
 
 For the XO bounty, Torc ships an original XO template whose `contribute` action spends the real TorcCircle
 covenant, computing the next state commitment inside the template, with a valid contribution made through the
