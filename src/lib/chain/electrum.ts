@@ -90,6 +90,7 @@ export const RELAY_METHODS = new Set([
   'blockchain.scripthash.get_history',
   'blockchain.scripthash.get_mempool',
   'blockchain.transaction.get',
+  'blockchain.transaction.get_merkle',
   'blockchain.transaction.broadcast',
   'blockchain.headers.get_tip',
   'blockchain.block.header',
@@ -117,5 +118,28 @@ export function fanoutCaller(hosts: string[], timeoutMs = 5000): ElectrumCall {
       return txidOf(String(params[0]));
     }
     throw new Error(errs.join(' | '));
+  };
+}
+
+/**
+ * Browser caller: Electrum WebSocket first; if the socket cannot connect (blocked port, captive
+ * network), fall back to the /api/chain HTTPS relay for relay-allowed methods and stay there.
+ */
+export function wsWithRelayFallback(hosts: string[], baseUrl: string, timeoutMs = 8000): ElectrumCall {
+  const ws = electrumCaller(hosts, timeoutMs);
+  const relay = relayCaller(baseUrl);
+  let useRelay = false;
+  return async (method, ...params) => {
+    if (useRelay && RELAY_METHODS.has(method)) return relay(method, ...params);
+    try {
+      return await ws(method, ...params);
+    } catch (e) {
+      const msg = String((e as Error)?.message ?? e);
+      if (RELAY_METHODS.has(method) && /timed out|disconnect|connection|socket|reachable|connect/i.test(msg)) {
+        useRelay = true;
+        return relay(method, ...params);
+      }
+      throw e;
+    }
   };
 }

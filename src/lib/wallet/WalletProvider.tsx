@@ -9,7 +9,7 @@ import { placeholderP2PKHUnlocker, isPlaceholderUnlocker, type SpendableUtxo, ty
 import { encodeCashAddress, hash160, binToHex } from '@bitauth/libauth';
 import { BRAND_NAME, BRAND_SLUG } from '@/brand';
 import { NETWORK, electrumHosts } from '@/lib/chain/config';
-import { electrumCaller } from '@/lib/chain/electrum';
+import { wsWithRelayFallback } from '@/lib/chain/electrum';
 import { TorcProvider } from '@/lib/chain/provider';
 import { prefixFor } from '@/lib/torc/address';
 import type { WalletSide } from '@/lib/torc/txs';
@@ -45,7 +45,7 @@ const CHILD = { receive: 0, change: 1 } as const;
 export function WalletProvider({ children }: { children: React.ReactNode }) {
   const icon = typeof window !== 'undefined' ? `${window.location.origin}/apple-icon` : undefined;
   const wc = useWizardConnect({ dappName: BRAND_NAME, dappIcon: icon, sessionKey: `${BRAND_SLUG}-wizardconnect` });
-  const provider = useMemo(() => new TorcProvider(electrumCaller(electrumHosts(), 8000), NETWORK), []);
+  const provider = useMemo(() => new TorcProvider(wsWithRelayFallback(electrumHosts(), typeof window !== 'undefined' ? window.location.origin : '', 8000), NETWORK), []);
   const [addresses, setAddresses] = useState<HdAddress[]>([]);
   const [utxos, setUtxos] = useState<SpendableUtxo[]>([]);
   const [scanning, setScanning] = useState(false);
