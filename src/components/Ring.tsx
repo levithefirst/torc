@@ -34,8 +34,8 @@ export function Ring({ snap, names }: { snap: Snapshot; names: string[] }) {
   const skew = Math.min(12, span * 0.1);
   const colorOf = (i: number, st: SeatStatus) => (i === turn ? 'var(--turn)' : st === 'due' ? 'var(--due)' : st === 'mempool' ? 'var(--mempool)' : 'var(--confirmed)');
   return (
-    <figure className="relative mx-auto w-full max-w-[250px] sm:max-w-[460px]" data-testid="ring" data-seats={n} data-turn={turn}>
-      <svg viewBox="0 0 240 240" className="w-full overflow-visible" role="img" aria-label={`Circle of ${n} seats, round ${snap.state.round}, ${seatName(names, turn)}'s turn`}>
+    <figure className="relative mx-auto w-full max-w-[460px]" data-testid="ring" data-seats={n} data-turn={turn}>
+      <svg viewBox="0 0 240 240" className="mx-auto block w-full max-w-[250px] overflow-visible sm:max-w-none" role="img" aria-label={`Circle of ${n} seats, round ${snap.state.round}, ${seatName(names, turn)}'s turn`}>
         {/* Instrument bezel: a hairline track and one tick per seat boundary. */}
         <circle cx={C} cy={C} r={R + 9} fill="none" stroke="var(--line)" strokeWidth="1" />
         <circle cx={C} cy={C} r={r - 9} fill="none" stroke="var(--line)" strokeWidth="1" strokeDasharray="1 4" />
@@ -81,7 +81,7 @@ export function Ring({ snap, names }: { snap: Snapshot; names: string[] }) {
       <figcaption className="sr-only">Turn: {seatName(names, turn)}</figcaption>
       <ul className="mt-4 grid gap-2 text-[13px] sm:mt-5" style={{ gridTemplateColumns: `repeat(${Math.min(n, 3)}, minmax(0,1fr))` }}>
         {statuses.map((st, i) => (
-          <li key={i} className={`flex min-w-0 items-center gap-2 rounded-full border px-2.5 py-1.5 ${i === turn ? 'border-turn' : 'rule'}`} data-testid={`seat-label-${i}`}>
+          <li key={i} className={`flex min-w-0 items-center gap-1.5 rounded-full border px-2.5 py-1.5 ${i === turn ? 'border-turn' : 'rule'}`} data-testid={`seat-label-${i}`}>
             <span
               aria-hidden
               className="inline-block size-2.5 shrink-0 rounded-full"
