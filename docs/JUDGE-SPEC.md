@@ -17,3 +17,9 @@ Run 2026-11-19 14:26 UTC, deployment of commit 863fe9e: **14 / 14 passed** (26.7
 Raw timings: `docs/runs/`. The run sets `WS_BLOCKED=1` because the build sandbox blocks Electrum WSS ports; that flag only ignores the
 browser's "WebSocket connection failed" console message. On a normal network the page uses Electrum WSS directly.
 Contract-level core loop (CI, MockNetworkProvider): one full contribute→claim cycle in ~4.5 s (< 10 s).
+
+**Correction (19 Nov):** test 3 used to treat any feed row missing from the first render as "new". A stale
+first render could make it match a tx that this click did not broadcast (seen in latency pass 2, kept as
+`docs/runs/latency-runs-v2-stale-match.jsonl`). Test 3 now reads the txid from this click's
+`/api/demo/tick` response and waits for that exact row to show SEEN. The 2,025 / 2,933 ms figures above came
+from the old matcher; docs/LATENCY.md has the numbers from the fixed test.

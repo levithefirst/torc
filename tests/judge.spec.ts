@@ -53,24 +53,20 @@ test('2. live circle from the chain within 10 s, no wallet, no click', async ({ 
 test('3. "Run the next step live" shows a new SEEN 0-conf tx within 10 s of the click', async ({ page }, info) => {
   await page.goto('/');
   await expect(page.getByTestId('feed-row').first()).toBeVisible({ timeout: 10_000 });
-  const before = new Set(await page.getByTestId('feed-row').evaluateAll((els) => els.map((e) => e.getAttribute('data-txid'))));
   const button = page.getByTestId('run-next');
   await expect(button).toBeEnabled();
   const t0 = Date.now(); // clock starts at the actual click
+  // Bind the measurement to THIS click: read the tick response's txid and wait for that exact row to show SEEN.
+  // (Matching "any row not in the first render" can pick up a tx that a stale first render simply missed.)
+  const tick = page.waitForResponse((r) => r.url().includes('/api/demo/tick') && r.request().method() === 'POST', { timeout: 10_000 });
   await button.click();
-  const fresh = page.locator('[data-testid=feed-row]', { has: page.getByTestId('status-seen') }).filter({
-    hasNot: page.locator(`[data-txid="__none__"]`),
-  });
   const outcome = await Promise.race([
     (async () => {
-      for (;;) {
-        const rows = await fresh.evaluateAll((els) => els.map((e) => e.getAttribute('data-txid')));
-        const n = rows.find((t) => t && !before.has(t));
-        if (n) return { kind: 'seen' as const, txid: n };
-        await page.waitForTimeout(100);
-      }
+      const body = (await (await tick).json()) as { ok: boolean; txid?: string; reason?: string; message?: string };
+      if (!body.ok || !body.txid) return { kind: 'wait' as const, text: body.message ?? String(body.reason) };
+      await page.locator(`[data-testid=feed-row][data-txid="${body.txid}"]`, { has: page.getByTestId('status-seen') }).waitFor({ timeout: 10_000 });
+      return { kind: 'seen' as const, txid: body.txid };
     })(),
-    page.getByTestId('run-wait').waitFor({ timeout: 10_000 }).then(async () => ({ kind: 'wait' as const, text: await page.getByTestId('run-wait').innerText() })),
     page.waitForTimeout(10_000).then(() => ({ kind: 'timeout' as const })),
   ]);
   const ms = Date.now() - t0;
