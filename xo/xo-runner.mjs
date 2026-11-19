@@ -76,9 +76,12 @@ try {
     log('requirements', await engine.listRequirements(inv.invitation ?? inv));
     try { inv = await engine.joinInvitationRole(id, 'member'); } catch (e) { log('join member', String(e?.message ?? e)); }
     try { inv = await engine.joinInvitationRole(id, 'circle'); } catch (e) { log('join circle', String(e?.message ?? e)); }
+    // Numbers must be BigInt: the engine stores them as extended JSON ("20000n"); a plain number
+    // comes back as the string "20000", which CashAssembly then reads as UTF-8 bytes.
+    const big = (v) => (typeof v === 'number' ? BigInt(v) : v);
     const vars = [
-      ...Object.entries(job.circle).map(([variableIdentifier, value]) => ({ variableIdentifier, roleIdentifier: 'circle', value })),
-      ...Object.entries(job.member).map(([variableIdentifier, value]) => ({ variableIdentifier, roleIdentifier: 'member', value })),
+      ...Object.entries(job.circle).map(([variableIdentifier, value]) => ({ variableIdentifier, roleIdentifier: 'circle', value: big(value) })),
+      ...Object.entries(job.member).map(([variableIdentifier, value]) => ({ variableIdentifier, roleIdentifier: 'member', value: big(value) })),
     ];
     vars.push({ variableIdentifier: 'memberLockingScript', roleIdentifier: 'member', value: state.seatLock });
     inv = await engine.appendInvitation(id, { variables: vars });

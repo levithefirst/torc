@@ -348,14 +348,14 @@
       "description": "Sats every contribution UTXO carries (enforced by the covenant).",
       "icon": "coins",
       "type": "satoshis",
-      "value": "1000n"
+      "value": 1000
     },
     "minerFeeSatoshis": {
       "name": "Miner fee",
       "description": "Fixed fee for a contribute transaction (~1.3 kB at 1 sat/byte).",
       "icon": "coins",
       "type": "satoshis",
-      "value": "1600n"
+      "value": 1600
     }
   },
   "variables": {
