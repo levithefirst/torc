@@ -32,6 +32,7 @@ export interface Snapshot {
   mtp: number; // chain clock (median-time-past), unix seconds
   asOf: number; // ms, when this snapshot was read
   feed: FeedRow[];
+  historyCount?: number; // every tx that ever touched the covenant (the feed shows the latest)
 }
 
 type DecodedTx = ReturnType<typeof decodeTx>;
@@ -112,6 +113,7 @@ export async function readSnapshot(p: TorcProvider, params: CircleParams, opts: 
     mtp: clock.mtp,
     asOf: Date.now(),
     feed: feed.filter((r) => r.kind !== 'other'),
+    historyCount: history.length,
   };
 }
 

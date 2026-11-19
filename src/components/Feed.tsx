@@ -1,7 +1,8 @@
 'use client';
 import type { FeedRow } from '@/lib/torc/snapshot';
-import { explorerTx } from '@/lib/chain/config';
-import { fmtUnits, seatName, shortTx, type AssetInfo } from '@/lib/app/demo';
+import { explorerAddress } from '@/lib/chain/config';
+import { fmtUnits, seatName, type AssetInfo } from '@/lib/app/demo';
+import { TxLink } from './TxLink';
 
 export function TxStatus({ height }: { height: number }) {
   if (height > 0)
@@ -19,9 +20,10 @@ export function TxStatus({ height }: { height: number }) {
 
 const verb: Record<string, string> = { genesis: 'started the circle', contribute: 'paid in', claim: 'took the pot' };
 
-export function Feed({ rows, names, asset, highlight }: { rows: FeedRow[]; names: string[]; asset: AssetInfo; highlight?: string }) {
+export function Feed({ rows, names, asset, highlight, total, address }: { rows: FeedRow[]; names: string[]; asset: AssetInfo; highlight?: string; total?: number; address?: string }) {
   if (!rows.length) return <p className="text-sm text-text-2">No activity yet.</p>;
   return (
+    <>
     <ol className="divide-y divide-border-subtle" data-testid="feed">
       {rows.map((r) => (
         <li
@@ -44,13 +46,22 @@ export function Feed({ rows, names, asset, highlight }: { rows: FeedRow[]; names
               )}
               {r.round !== undefined && r.kind !== 'genesis' && <span className="text-text-2"> · round {r.round + 1}</span>}
             </div>
-            <a href={explorerTx(r.txid)} target="_blank" rel="noopener noreferrer" className="num text-[12px] text-accent-text underline-offset-2 hover:underline" data-testid="txid-link">
-              {shortTx(r.txid)}
-            </a>
+            <TxLink txid={r.txid} testId="txid-link" className="num text-[12px] text-accent-text underline-offset-2 hover:underline" />
           </div>
           <TxStatus height={r.height} />
         </li>
       ))}
     </ol>
+    {total !== undefined && (
+      <p className="mt-2 text-[12px] text-text-2" data-testid="feed-count">
+        Showing the latest {rows.length} of {total} circle transactions
+        {address && total > rows.length && (
+          <>
+            {' '}· <a className="text-accent-text underline-offset-2 hover:underline" href={explorerAddress(address)} target="_blank" rel="noopener noreferrer">full history on the explorer</a>
+          </>
+        )}
+      </p>
+    )}
+    </>
   );
 }

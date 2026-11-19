@@ -48,7 +48,7 @@ function Inner({ paramsJson, initial, names, name }: { paramsJson: CircleParamsJ
         <MemberPanel snap={snap} params={params} names={names} onSent={() => setTimeout(refresh, 800)} />
         <div>
           <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-text-2">On-chain activity</h3>
-          <Feed rows={snap.feed} names={names} asset={asset} />
+          <Feed rows={snap.feed} names={names} asset={asset} total={snap.historyCount} address={snap.address} />
         </div>
       </div>
     </section>

@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { electrumClient, electrumCaller, resetElectrum } from '@/lib/chain/electrum';
-import { electrumHosts, NETWORK } from '@/lib/chain/config';
+import { electrumHosts, NETWORK, BROWSER_WSS } from '@/lib/chain/config';
 import { TorcProvider, scripthashOf } from '@/lib/chain/provider';
 import { readSnapshot, type Snapshot } from '@/lib/torc/snapshot';
 import type { CircleParams } from '@/lib/torc/circle';
@@ -9,8 +9,10 @@ import type { CircleParams } from '@/lib/torc/circle';
 export type LiveStatus = 'connecting' | 'live' | 'polling' | 'offline';
 
 /**
- * Subscribes to the covenant address over Electrum WebSocket in the browser, re-reading the
- * circle on every notification. Falls back to polling /api/circle when Electrum is unreachable.
+ * Keeps a circle snapshot fresh in the browser. By default it polls /api/circle (the server reads
+ * the chain over Electrum and returns mempool txs too), so pages never open a WebSocket that a
+ * firewall may block. With NEXT_PUBLIC_BROWSER_WSS=1 it also subscribes over Electrum WebSocket
+ * and re-reads on every notification, keeping the server poll as the fallback.
  */
 export function useLiveSnapshot(params: CircleParams | null, initial: Snapshot | null) {
   const [snap, setSnap] = useState<Snapshot | null>(initial);
@@ -66,7 +68,8 @@ export function useLiveSnapshot(params: CircleParams | null, initial: Snapshot |
     let unsub: (() => void) | undefined;
     // Server snapshot right away (fast path); Electrum WebSocket in parallel for live updates.
     if (!initial || Date.now() - initial.asOf > 15_000) fetchServer();
-    (async () => {
+    else setStatus('polling');
+    if (BROWSER_WSS) (async () => {
       providerRef.current = new TorcProvider(electrumCaller(hosts, 6000), NETWORK);
       try {
         const client = await electrumClient(hosts, 4000);
@@ -92,6 +95,7 @@ export function useLiveSnapshot(params: CircleParams | null, initial: Snapshot |
       }
     })();
     // Without a WebSocket, poll the server every 4 s; with one, a slow safety refresh.
+    // (Every poll is one cached server read; the server holds the Electrum connection.)
     const iv = setInterval(() => { if (!electrumOk.current || Math.random() < 0.2) refresh(); }, 4_000);
     return () => { cancelled = true; clearInterval(iv); unsub?.(); };
   }, [params, refresh, fetchServer]); // eslint-disable-line react-hooks/exhaustive-deps
