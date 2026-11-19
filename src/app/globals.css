@@ -40,3 +40,13 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-sans);
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 }
+
+/* /deck markdown */
+.deck h1 { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 1rem; }
+.deck h2 { font-size: 1.15rem; font-weight: 600; margin: 1.75rem 0 0.5rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle); }
+.deck h3 { font-weight: 600; margin: 1rem 0 0.25rem; }
+.deck p, .deck li { color: var(--text-2); line-height: 1.6; overflow-wrap: anywhere; }
+.deck ul { list-style: disc; padding-left: 1.25rem; margin: 0.25rem 0; }
+.deck a { color: var(--accent-text); text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
+.deck code { font-family: var(--font-mono); font-size: 0.9em; background: var(--surface-2); padding: 0 0.25em; border-radius: 4px; overflow-wrap: anywhere; }
+.deck strong { color: var(--text); }

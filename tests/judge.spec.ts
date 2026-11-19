@@ -26,7 +26,7 @@ test('1. banner: deck, repo and donation address, no horizontal scroll', async (
   await expect(page.getByTestId('banner-deck')).toHaveAttribute('href', /.+/);
   await expect(page.getByTestId('banner-repo')).toHaveAttribute('href', /github\.com/);
   await expect(page.getByTestId('banner-donate')).toBeVisible();
-  for (const path of ['/new', '/circle/demo']) {
+  for (const path of ['/new', '/circle/demo', '/deck']) {
     await page.goto(path);
     await expect(page.getByTestId('banner')).toBeVisible();
   }
