@@ -7,7 +7,7 @@ dollar amount (PUSD) into the circle every round, and a CashScript covenant pays
 member whose turn it is. Membership is a CashTokens NFT, the circle's state is a CashTokens NFT, and no
 collector ever holds the money. There is no admin key.
 
-**Try it in 10 seconds:** https://torc-cash.vercel.app (chipnet). No wallet, no setup: the home page reads a live
+**Try it in 10 seconds:** https://torc-cash.vercel.app (BCH mainnet). No wallet, no setup: the home page reads a live
 circle from the chain, and "Run the next step live" broadcasts a real transaction you watch land as SEEN 0-conf.
 
 <!-- 15-second GIF / screenshot slot: docs/media/torc-15s.gif (record per docs/DEMO-SCRIPT.md) -->
@@ -120,8 +120,10 @@ See [docs/DEPLOYMENTS.md](docs/DEPLOYMENTS.md) (generated from `deployments/*.js
 - **Chipnet CLI run:** recorded as "Lagos Market Circle (CLI run)", 2 full rounds plus a seat transfer (seat 3 moved to a new holder).
 - **Chipnet XO run:** "XO Circle", contributions made through the XO engine (see docs/XO.md).
 - **tPUSD** (chipnet test asset, 2 decimals like PUSD): `fb9175ea28b49f530d1e21d521f52c91cf52db90c07af4c5bffbb85fcbb725d4`.
-- **Mainnet:** every path is built and tested and switches on by env alone (`NEXT_PUBLIC_NETWORK=mainnet`,
-  `NETWORK=mainnet` for scripts); seeding waits on a funded throwaway key (docs/HANDOFF.md §3).
+- **Mainnet (live on https://torc-cash.vercel.app):** "Torc Demo Circle" (`deployments/mainnet.json`), 3 seats
+  (Maya, Kofi, Diego), 2,000 sats each, 600 s test rounds, genesis
+  [`30aa2014…`](https://explorer.bitcoinunlimited.info/tx/30aa20143d3ff62f68277725f8c947a9dd530b6f280b7deebae661ff78969077).
+  The network switches by env alone (`NEXT_PUBLIC_NETWORK=mainnet`, `NETWORK=mainnet` for scripts).
 
 ## How a judge makes a useful mainnet transaction
 

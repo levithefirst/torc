@@ -5,7 +5,7 @@ import metrics from '../../../docs/metrics.json' with { type: 'json' };
 import { BRAND_NAME, PITCH } from '@/brand';
 import { DEMO } from '@/lib/app/demo';
 import { getSnapshot } from '@/lib/server/chain';
-import { DECK_URL, NETWORK, REPO_URL, explorerTx } from '@/lib/chain/config';
+import { DECK_URL, NETWORK, REPO_URL, explorerTx, explorerAddress } from '@/lib/chain/config';
 
 export const metadata = { title: 'Deck' };
 // Re-read the live circle at most every 5 minutes; the rest is fixed at build time.
@@ -35,7 +35,9 @@ const WALLET_TEST = [
   { what: 'Seat 3 pays 2,000 sats', txid: 'e32be41d17d2a82a595df90d4552e6e1519e261c8312391b3025936f4d94f2ea' },
   { what: 'Seat 2 pays 2,000 sats', txid: 'ffe74822eed7fe29996a155cf9bb817da50e3d67b832913898a3f8f999980aa3' },
 ];
-const CLI_CIRCLE_PAYOUTS = 2; // docs/DEPLOYMENTS.md, the CLI-run circle
+// Chipnet history (docs/DEPLOYMENTS.md and the chipnet demo covenant, 19 Nov 2026): 4 circles,
+// 7 payouts by the chipnet demo circle + 2 by the CLI-run circle.
+const CHIPNET_PAYOUTS = 9;
 
 function Slide({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
@@ -105,11 +107,11 @@ export default async function Deck() {
             <p>
               <a className="text-xl font-semibold text-accent-text underline" href={SITE}>torc-cash.vercel.app</a>
             </p>
-            <p>The page opens on a real circle on {NETWORK}. One click on <B>Run the next step live</B> signs and broadcasts its next real transaction (a payment, or the payout) with a demo seat key on the server. No wallet needed.</p>
+            <p>The page opens on a real circle on {NETWORK === 'mainnet' ? 'BCH mainnet' : NETWORK}. One click on <B>Run the next step live</B> signs and broadcasts its next real transaction (a payment, or the payout) with a demo seat key on the server. No wallet needed.</p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               <Stat value={`${lat.state} ms`} label="median time to a live circle on screen" />
               <Stat value={`${lat.seen} ms`} label="median click to SEEN 0-conf" />
-              {demoPayouts !== null && <Stat value={String(demoPayouts)} label={`payouts made by the demo circle${demoTxs ? ` (${demoTxs} txs)` : ''}`} />}
+              {demoPayouts !== null && <Stat value={String(demoPayouts)} label={`payouts made by the ${NETWORK} demo circle${demoTxs ? ` (${demoTxs} txs)` : ''}`} />}
             </div>
             <p className="text-[13px]">Production, 10 runs, 19 Nov 2026 (docs/LATENCY.md). The demo circle uses 10-minute test rounds so a full cycle fits in a visit.</p>
           </div>
@@ -172,10 +174,18 @@ export default async function Deck() {
         </div>
       </Slide>
 
-      <Slide n={7} title="What runs today (chipnet)">
+      <Slide n={7} title="What runs today">
+        {DEMO && NETWORK === 'mainnet' && (
+          <p>
+            <B>Live on BCH mainnet:</B> the {DEMO.name} (3 seats, 2,000 sats each, 10-minute rounds), seats held by demo keys and driven by the site’s button.{' '}
+            <a className="num text-accent-text underline" href={explorerTx(DEMO.genesisTxid)}>genesis {DEMO.genesisTxid.slice(0, 10)}…</a> ·{' '}
+            <a className="text-accent-text underline" href={explorerAddress(snap?.address ?? DEMO.tokenAddress)}>covenant</a>
+            {demoPayouts !== null && <> · {demoPayouts} payout{demoPayouts === 1 ? '' : 's'} so far</>}
+          </p>
+        )}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat value="4" label="circles created" />
-          <Stat value={demoPayouts !== null ? String(demoPayouts + CLI_CIRCLE_PAYOUTS) : '8+'} label="payouts made by covenants" />
+          <Stat value="4" label="circles on chipnet (testnet)" />
+          <Stat value={String(CHIPNET_PAYOUTS)} label="payouts made by covenants on chipnet" />
           <Stat value="1" label="seat transferred on chain, then paid in by its new holder" />
           <Stat value="1" label="contribution through the XO engine" />
         </div>
@@ -186,7 +196,7 @@ export default async function Deck() {
               <li key={t.txid}>{t.what}: <a className="num text-accent-text underline" href={explorerTx(t.txid, 'chipnet')}>{t.txid.slice(0, 10)}…</a></li>
             ))}
           </ul>
-          <p className="mt-1 text-[13px]">The payout from a real wallet and a Selene test are still to do. Mainnet is pending a funded treasury.</p>
+          <p className="mt-1 text-[13px]">The payout from a real wallet and a Selene test are still to do.</p>
         </div>
       </Slide>
 
