@@ -1,7 +1,7 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MockNetworkProvider, randomUtxo, placeholderP2PKHUnlocker } from 'cashscript';
+import { dryRunGenesis } from '@/lib/app/dryRun';
 import { useWallet, ConnectButton } from '@/lib/wallet/WalletProvider';
 import { buildGenesis, buildPrepare, pickGenesisInput } from '@/lib/torc/txs';
 import { isValidAddress } from '@/lib/torc/address';
@@ -11,7 +11,6 @@ import { TxLink } from './TxLink';
 import { PUSD_MAINNET } from '@/lib/app/demo';
 import chipnetAsset from '../../deployments/chipnet-asset.json' with { type: 'json' };
 import { BRAND_NAME } from '@/brand';
-import { encodeCashAddress } from '@bitauth/libauth';
 
 const ASSET_CATEGORY = NETWORK === 'mainnet' ? PUSD_MAINNET : chipnetAsset.category;
 const ASSET_SYMBOL = NETWORK === 'mainnet' ? 'PUSD' : 'tPUSD';
@@ -57,15 +56,7 @@ function Form() {
   function dryRun() {
     setMsg(null);
     try {
-      // Dry run: a local mock chain with one example input (not a real coin). Shows the exact
-      // genesis the wallet would be asked to sign, without any wallet.
-      const provider = new MockNetworkProvider();
-      const addrs = list.map((m, i) => (isValidAddress(m, NETWORK) ? m : null) ?? exampleAddress(i));
-      const payer = addrs[0]!;
-      const u = provider.addUtxo(payer, randomUtxo({ vout: 0, satoshis: 100_000n }));
-      const g = buildGenesis({ provider, params: { ...params, contribution: contribution || 10n }, wallet: { utxos: [u], unlocker: placeholderP2PKHUnlocker(payer), address: payer }, members: addrs, startTime: Math.floor(Date.now() / 1000) });
-      const hex = g.builder.build();
-      setDry({ size: Number(g.builder.getTransactionSize()), fee: Number(g.builder.calculateTransactionFee().feeSats), covenant: g.contract.tokenAddress, outputs: g.builder.outputs.length, hex });
+      setDry(dryRunGenesis({ ...params, contribution: contribution || 10n }, list));
     } catch (e) {
       setMsg({ text: String((e as Error).message), error: true });
     }
@@ -171,9 +162,3 @@ function Form() {
     </div>
   );
 }
-
-function exampleAddress(i: number) {
-  // Deterministic, obviously-fake example P2PKH addresses for the dry run.
-  return encodeCashAddress({ payload: new Uint8Array(20).fill(i + 1), prefix: NETWORK === 'mainnet' ? 'bitcoincash' : 'bchtest', type: 'p2pkh' }).address;
-}
-
