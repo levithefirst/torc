@@ -46,6 +46,11 @@ function Form() {
   }, [amount, mode]);
   const list = members.slice(0, seats).map((m) => m.trim());
   const valid = list.every((m) => isValidAddress(m, NETWORK)) && contribution > 0n && (mode === 'token' || contribution >= 1000n);
+  // Say why Create stays disabled, for anything the user has typed (empty seats are not nagged).
+  const problems = [
+    ...list.flatMap((m, i) => (m && !isValidAddress(m, NETWORK) ? [`seat ${i + 1} is not a ${NETWORK} address (${NETWORK === 'mainnet' ? 'bitcoincash' : 'bchtest'}:…)`] : [])),
+    ...(contribution <= 0n ? [`the amount must be a number above 0${mode === 'token' ? ' (at least 0.01)' : ''}`] : mode === 'bch' && contribution < 1000n ? ['a BCH circle needs at least 1,000 sats each'] : []),
+  ];
   const params = { network: NETWORK, mode, assetCategory: mode === 'token' ? ASSET_CATEGORY : undefined, contribution, seats, period } as const;
 
   function fillMine() {
@@ -133,6 +138,9 @@ function Form() {
           </button>
           <button type="button" onClick={dryRun} className="rounded-[var(--radius)] border border-border px-4 py-2 text-sm" data-testid="btn-dry-run">Dry run (no wallet)</button>
         </div>
+        {problems.length > 0 && (
+          <p className="text-sm text-warning" data-testid="create-problems">Check: {problems.join('; ')}.</p>
+        )}
         {msg && (
           <p className={`text-sm ${msg.error ? 'text-danger' : 'text-text-2'}`} data-testid="create-msg">
             {msg.text} {msg.txid && <TxLink txid={msg.txid} />}
@@ -140,7 +148,7 @@ function Form() {
         )}
         {dry && (
           <div className="rounded border border-dashed border-border p-3 text-sm" data-testid="dry-run-result">
-            <div className="font-semibold">Unsigned genesis (dry run, example input)</div>
+            <div className="font-semibold">Unsigned genesis (dry run, example input{list.some((m) => !isValidAddress(m, NETWORK)) ? '; empty or invalid seats use example addresses' : ''})</div>
             <p className="mt-1 text-text-2">
               {dry.outputs} outputs: 1 state NFT into the covenant, {seats} member NFTs, the params OP_RETURN, change. <span className="num">{dry.size} bytes · {dry.fee} sats fee</span>.
             </p>
