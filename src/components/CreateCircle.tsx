@@ -1,7 +1,7 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { dryRunGenesis } from '@/lib/app/dryRun';
+import { dryRunGenesis, type DryRun } from '@/lib/app/dryRun';
 import { useWallet, ConnectButton } from '@/lib/wallet/WalletProvider';
 import { buildGenesis, buildPrepare, pickGenesisInput } from '@/lib/torc/txs';
 import { isValidAddress } from '@/lib/torc/address';
@@ -35,7 +35,7 @@ function Form() {
   const [mode, setMode] = useState<AssetMode>('token');
   const [amount, setAmount] = useState('0.10');
   const [period, setPeriod] = useState(PERIODS[NETWORK === 'chipnet' ? 1 : 0]!.s);
-  const [dry, setDry] = useState<null | { size: number; fee: number; covenant: string; outputs: number; hex: string }>(null);
+  const [dry, setDry] = useState<null | (DryRun & { seats: number })>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ text: string; txid?: string; error?: boolean } | null>(null);
 
@@ -61,7 +61,7 @@ function Form() {
   function dryRun() {
     setMsg(null);
     try {
-      setDry(dryRunGenesis({ ...params, contribution: contribution || 10n }, list));
+      setDry({ ...dryRunGenesis({ ...params, contribution: contribution || 10n }, list), seats });
     } catch (e) {
       setMsg({ text: String((e as Error).message), error: true });
     }
@@ -150,7 +150,7 @@ function Form() {
           <div className="rounded border border-dashed border-border p-3 text-sm" data-testid="dry-run-result">
             <div className="font-semibold">Unsigned genesis (dry run, example input{list.some((m) => !isValidAddress(m, NETWORK)) ? '; empty or invalid seats use example addresses' : ''})</div>
             <p className="mt-1 text-text-2">
-              {dry.outputs} outputs: 1 state NFT into the covenant, {seats} member NFTs, the params OP_RETURN, change. <span className="num">{dry.size} bytes · {dry.fee} sats fee</span>.
+              {dry.outputs} outputs: 1 state NFT into the covenant, {dry.seats} member NFTs, the params OP_RETURN, change. <span className="num">{dry.size} bytes · {dry.fee} sats fee</span>.
             </p>
             <p className="num mt-1 break-all text-[12px]">covenant {dry.covenant}</p>
             <details className="mt-1"><summary className="cursor-pointer text-[12px] text-text-2">raw hex</summary><p className="num break-all text-[11px] text-text-2">{dry.hex}</p></details>
