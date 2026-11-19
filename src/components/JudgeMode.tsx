@@ -15,9 +15,13 @@ const contractUrl = (line: number) => `${REPO_URL}/blob/main/contracts/TorcCircl
 export function fmtLocal(ms: number) {
   return new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }).format(ms);
 }
+/** Same on server and client (no locale or time zone), for the first render before hydration. */
+const fmtUtc = (ms: number) => `${new Date(ms).toISOString().slice(11, 16)} UTC`;
 
-function StatusPill({ status, asOf, stale }: { status: LiveStatus; asOf?: number; stale?: boolean }) {
-  if ((status === 'live' || status === 'polling') && !stale && asOf && Date.now() - asOf < 30_000)
+// `now` is null on the server and on the first client render, so the hydrated text matches the
+// server HTML (React error #418 otherwise: the server formats times in UTC, the browser locally).
+function StatusPill({ status, asOf, stale, now }: { status: LiveStatus; asOf?: number; stale?: boolean; now: number | null }) {
+  if ((status === 'live' || status === 'polling') && !stale && asOf && now !== null && now - asOf < 30_000)
     return (
       <span data-testid="live-status" data-status="live" className="inline-flex items-center gap-1.5 text-[12px] text-text-2">
         <span aria-hidden className="size-2 rounded-full bg-confirmed" /> live from {NETWORK} · {status === 'live' ? 'Electrum WebSocket' : 'server relay'}
@@ -26,7 +30,7 @@ function StatusPill({ status, asOf, stale }: { status: LiveStatus; asOf?: number
   return (
     <span data-testid="live-status" data-status={status} className="inline-flex items-center gap-1.5 text-[12px] text-warning">
       <span aria-hidden className="size-2 rounded-full border border-warning" />
-      {asOf ? `as of ${fmtLocal(asOf)}` : 'chain not reached yet'} · {status === 'polling' ? 'live via server' : status === 'connecting' ? 'connecting live feed' : 'reconnecting'}
+      {asOf ? `as of ${now === null ? fmtUtc(asOf) : fmtLocal(asOf)}` : 'chain not reached yet'} · {status === 'polling' ? 'live via server' : status === 'connecting' ? 'connecting live feed' : 'reconnecting'}
     </span>
   );
 }
@@ -57,10 +61,10 @@ export function JudgeMode({ initial, paramsJson, names, circleName, stale, event
   const params = useMemo(() => paramsFromJson(paramsJson), [paramsJson]);
   const { snap, status, refresh, setSnap } = useLiveSnapshot(params, initial);
   const asset = assetInfo(paramsJson);
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState<number | null>(null);
   const [t, setT] = useState<TickState>({ s: 'idle' });
   const [prevTurn, setPrevTurn] = useState(initial?.turnSeat);
-  useEffect(() => { const iv = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(iv); }, []);
+  useEffect(() => { setNow(Date.now()); const iv = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(iv); }, []);
   useEffect(() => { if (snap) setPrevTurn(snap.turnSeat); }, [snap]);
 
   async function runNext() {
@@ -92,7 +96,7 @@ export function JudgeMode({ initial, paramsJson, names, circleName, stale, event
     claim: snap?.feed.find((f) => f.kind === 'claim')?.txid ?? events.find((e) => e.kind === 'claim')?.txid,
   };
 
-  const waitLeft = t.s === 'wait' ? Math.max(0, Math.ceil((t.until - now) / 1000)) : 0;
+  const waitLeft = t.s === 'wait' ? Math.max(0, Math.ceil((t.until - (now ?? Date.now())) / 1000)) : 0;
   const potTotal = BigInt(params.contribution) * BigInt(params.seats);
   const claimDue = snap?.next.kind === 'claim';
   const lastClaim = snap?.feed.find((f) => f.kind === 'claim');
@@ -103,7 +107,7 @@ export function JudgeMode({ initial, paramsJson, names, circleName, stale, event
       <div>
         <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="text-lg font-semibold">{circleName}</h2>
-          <StatusPill status={status} asOf={snap?.asOf} stale={stale && status !== 'live' && snap === initial} />
+          <StatusPill status={status} asOf={snap?.asOf} stale={stale && status !== 'live' && snap === initial} now={now} />
         </div>
         {snap ? <Ring snap={snap} names={names} key={prevTurn} /> : <p className="py-16 text-center text-text-2">Reaching the chain…</p>}
       </div>
@@ -114,7 +118,7 @@ export function JudgeMode({ initial, paramsJson, names, circleName, stale, event
             <p className="text-[15px]" data-testid="pot">
               <span className="num text-xl font-semibold" data-testid="pot-amount">{fmtUnits(snap.potUnits, asset)}</span>{' '}
               <span className="text-text-2">in the ring ·</span> <span className="num">{snap.paid} of {snap.params.seats}</span>{' '}
-              <span className="text-text-2">paid ·</span> <span>{payoutLine(snap, now)}</span>
+              <span className="text-text-2">paid ·</span> <span>{payoutLine(snap, now ?? snap.asOf)}</span>
             </p>
             <p className="mt-1 text-sm text-text-2" data-testid="turn-label">
               Round {snap.state.round + 1} · pays <span className="font-medium text-text">{seatName(names, snap.turnSeat)}</span> next · {fmtUnits(BigInt(snap.params.contribution) * BigInt(snap.params.seats), asset)} pot
