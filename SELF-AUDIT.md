@@ -38,7 +38,7 @@ Score before → after: 7 · **6 → 7** · 7 · 6.
 
 - **+** It is not a crowdfund: no goal, no refund, no campaign owner. Money rotates to a different member each round, enforced on chain.
 - **+** The rule that matters is enforced, not trusted: `claim()` pays exactly `contribution × seats` to *the spender of the turn seat's NFT* and nothing else leaves the covenant (`pool()` only moves inside a claim that advances the round).
-- **+** 12 attack tests, each asserting the exact failing `require` or the consensus rule (see `tests/contract/attacks.test.ts`).
+- **+** 14 attack tests (13 token-mode, 1 BCH-mode), each asserting the exact failing `require` or the consensus rule (see `tests/contract/attacks.test.ts`).
 - **−** Defaults stall the circle forever. → By design for v1 (documented in README "What happens if someone doesn't pay"); bond NFTs are the v2 answer.
 - **−** The genesis is not checked by any covenant: a creator could mint a state NFT with `roundStart` in the past so round 1 opens early. → Members can read the state before contributing (the app shows it); documented below.
 - **−** "Fraction of a cent" was too vague. → README gives measured sizes and fees per contribution and per round.

@@ -114,7 +114,9 @@ In PUSD mode each contribution UTXO carries exactly 1,000 sats (enforced), which
 See [docs/DEPLOYMENTS.md](docs/DEPLOYMENTS.md) (generated from `deployments/*.json`, every txid linked).
 
 - **Chipnet web demo:** "Lagos Market Circle", `bchtest:rwn42zlapczu660my03ws0m7kfl6pl4350q4dvgvat0459n95wj6zmgf2vfmg`
-  (seats held by the server's demo keys, driven by the site's button).
+  (seats held by the server's demo keys, driven by the site's button; **10-minute test rounds**, real circles
+  use a day or a week). The site reads it through its own `/api/chain` / `/api/circle` relay (the server talks
+  Electrum), so browsers never need a WebSocket.
 - **Chipnet CLI run:** "Lagos Market Circle (CLI run)", 2 full rounds plus a seat transfer (Chidi → Dayo).
 - **Chipnet XO run:** "XO Circle", contributions made through the XO engine (see docs/XO.md).
 - **tPUSD** (chipnet test asset, 2 decimals like PUSD): `fb9175ea28b49f530d1e21d521f52c91cf52db90c07af4c5bffbb85fcbb725d4`.
@@ -142,10 +144,15 @@ builds the transaction with placeholder P2PKH unlockers, and asks the wallet to 
 
 | Wallet | Status |
 |---|---|
-| Selene (WizardConnect) | Integration built against the package types; real-device chipnet test is HANDOFF §4 |
-| Paytaca | Listed by WizardConnect docs as an implementer; test in HANDOFF §4 |
+| Paytaca (browser extension, WizardConnect) | **Tested end to end on chipnet, 19 Nov 2026:** created a 3-seat BCH circle (2,000 sats, 10-minute test rounds), then all three seats paid in from the wallet. Txids: create [`a512ff9c…`](https://cbch.loping.net/tx/a512ff9c80783b14a1fdbdf8ea7f7e65d6ef223463fec8a9a29fe1309fb936bf), seat 1 [`26ea2d72…`](https://cbch.loping.net/tx/26ea2d72f1afbb105bafb99da2be3b100107722eeabec13298ae0e993ab285e0), seat 3 [`e32be41d…`](https://cbch.loping.net/tx/e32be41d17d2a82a595df90d4552e6e1519e261c8312391b3025936f4d94f2ea), seat 2 [`ffe74822…`](https://cbch.loping.net/tx/ffe74822eed7fe29996a155cf9bb817da50e3d67b832913898a3f8f999980aa3). Not yet tested from a wallet: claim() and seat transfer (both covered by contract tests and done on chipnet with CLI keys). The test found four wallet-path bugs, all fixed. |
+| Selene (WizardConnect) | Built against the package types; **not yet tested** on a real device |
 | Cashonize | BCH WalletConnect v2 path not built (next) |
-| Automated | Wallet-free dry run + Playwright judge spec in CI |
+| Automated | Wallet-free dry run + Playwright judge spec |
+
+Creating a circle may ask for two signatures: CashTokens require the new category to come from an output at
+index 0, so if the wallet has no such coin Torc first asks it to sign a small self-send, then the genesis.
+After a page reload the stored session is restored from the browser (seats show at once); signing then needs the
+wallet open, and **Pair again** starts a fresh pairing if the wallet has dropped the session.
 
 ## XO
 
@@ -160,11 +167,11 @@ Details, invitation steps and txids: [docs/XO.md](docs/XO.md).
 ```
 contracts/            TorcCircle.cash, TorcCircleBch.cash
 src/lib/torc/         state codec, contract factory, tx builders, chain snapshot, demo tick
-src/lib/chain/        Electrum (WSS, failover), HTTPS relay client, NetworkProvider
+src/lib/chain/        Electrum (WSS, failover; server side), HTTPS relay client (browser), NetworkProvider
 src/lib/wallet/       WizardConnect provider (HD discovery, inputPaths, sign + broadcast)
 src/app/              Next.js App Router: judge mode, /circle/[address], /new, /deck, API routes
 scripts/              keys:new, faucet, tpusd:mint, circle:create|tick|inspect, seat:transfer, fund:seats
-tests/contract/       Vitest + MockNetworkProvider: happy paths, 12 attack cases, seat transfer, BCH mode, metrics
+tests/contract/       Vitest + MockNetworkProvider: happy path, 14 attack cases, seat transfer, BCH mode, metrics (24 tests with tests/unit)
 tests/judge.spec.ts   Playwright judge spec (mobile 360 + desktop) against BASE_URL
 xo/                   XO template, generator, engine runner
 docs/                 SDK-NOTES, DEPLOYMENTS, LATENCY, XO, HANDOFF, DECK, DEMO-SCRIPT, SUBMISSION, color theme
@@ -174,7 +181,7 @@ docs/                 SDK-NOTES, DEPLOYMENTS, LATENCY, XO, HANDOFF, DECK, DEMO-S
 
 ```bash
 npm install
-npm test                          # contracts + unit (no network)
+npm test                          # 24 tests: contracts (14 attack cases) + unit (no network)
 npm run dev                       # http://localhost:3000 (chipnet)
 BASE_URL=https://torc-cash.vercel.app npx playwright test
 NETWORK=chipnet npm run circle:inspect
@@ -186,7 +193,11 @@ gitleaks over the full history.
 
 ## What's next
 
-- **Bond NFTs** for defaults: a deposit per seat, forfeited to the pot on a missed round.
+- **If someone doesn't pay (v2):** today a missing payment pauses the round and the paid-in money stays locked
+  until that seat pays (no deadline, no refund; a member who already took the pot can stop paying). v2 adds a
+  timeout refund (each payer takes their own contribution back with their seat NFT after the deadline plus grace),
+  a per-seat bond forfeited to the members who paid, and a payout bond that holds back what a member still owes
+  after taking the pot. The same answer is on the landing page and in the deck.
 - **Larger circles** (6–12 seats) using the May 2026 loop opcodes instead of unrolled checks.
 - **Reminders**: push / SMS before a contribution is due (the .ics download is the first step).
 - Cashonize and other wallets via BCH WalletConnect v2.

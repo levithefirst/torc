@@ -15,7 +15,7 @@ Run 2026-11-19 14:26 UTC, deployment of commit 863fe9e: **14 / 14 passed** (26.7
 | 7 | Electrum down (all WebSockets closed and /api/circle → 503): last known state still rendered and labelled | ✅ | ✅ |
 
 Raw timings: `docs/runs/`. The run sets `WS_BLOCKED=1` because the build sandbox blocks Electrum WSS ports; that flag only ignores the
-browser's "WebSocket connection failed" console message. On a normal network the page uses Electrum WSS directly.
+browser's "WebSocket connection failed" console message. Since 19 Nov the browser reads through the site's HTTPS relay by default and opens no WebSocket (`NEXT_PUBLIC_BROWSER_WSS=1` turns the direct Electrum WSS back on).
 Contract-level core loop (CI, MockNetworkProvider): one full contribute→claim cycle in ~4.5 s (< 10 s).
 
 **Correction (19 Nov):** test 3 used to treat any feed row missing from the first render as "new". A stale
