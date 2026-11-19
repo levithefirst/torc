@@ -21,8 +21,8 @@ Score before → after: 7 · 7 · 7 · **5 → 6** (deck page now exists; donati
 
 *Looks for: does the guest view really work, does the wallet path work, anything broken.*
 
-- **+** Guest view: ring, pot, feed and a real tx on screen in < 1 s with no wallet (judge spec test 2: 728–1,306 ms).
-- **+** "Run the next step live" produces a real tx that shows SEEN 0-conf in ~1.4–2.9 s (test 3), and the turn advances on payout.
+- **+** Guest view: ring, pot, feed and a real tx on screen in about 1.2 s with no wallet (median of 10 production runs, docs/LATENCY.md).
+- **+** "Run the next step live" produces a real tx that shows SEEN 0-conf in a median 2.4 s (1.9–3.3 s over 10 broadcasts, docs/LATENCY.md), and the turn advances on payout.
 - **+** Electrum down: the page keeps the last server-rendered state and says "as of HH:MM · reconnecting" (test 7, green on production).
 - **−** **WizardConnect has not been tested against a real Selene yet.** The integration follows the package types (xpub discovery, placeholder P2PKH unlockers, `inputPaths`, broadcast by the dapp) but no device test has run. → HANDOFF §4 (Pixel test on chipnet). Stated plainly in README "Wallets".
 - **−** `/new` showed two gold buttons (Connect and Create) before a wallet was connected. → **Fixed**: Create stays outlined until a wallet is connected.
