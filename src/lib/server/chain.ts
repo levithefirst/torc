@@ -1,5 +1,5 @@
 import 'server-only';
-import { electrumCaller, relayCaller } from '../chain/electrum';
+import { fanoutCaller, relayCaller } from '../chain/electrum';
 import { electrumHosts, NETWORK } from '../chain/config';
 import { TorcProvider } from '../chain/provider';
 import { readSnapshot, discoverParams, type Snapshot } from '../torc/snapshot';
@@ -7,7 +7,7 @@ import type { CircleParams } from '../torc/circle';
 
 // TORC_RELAY_URL lets a sandboxed dev server read the chain through a deployed relay.
 export const serverProvider = new TorcProvider(
-  process.env.TORC_RELAY_URL ? relayCaller(process.env.TORC_RELAY_URL) : electrumCaller(electrumHosts(), 5000),
+  process.env.TORC_RELAY_URL ? relayCaller(process.env.TORC_RELAY_URL) : fanoutCaller(electrumHosts(), 5000),
   NETWORK,
 );
 

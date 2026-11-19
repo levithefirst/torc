@@ -1,13 +1,13 @@
 // Public Electrum relay: whitelisted read methods + broadcast. Lets clients without WebSocket
 // access (and the server itself) reach the chain over HTTPS. Holds no keys.
 import { NextResponse } from 'next/server';
-import { electrumCaller, RELAY_METHODS } from '@/lib/chain/electrum';
+import { fanoutCaller, RELAY_METHODS } from '@/lib/chain/electrum';
 import { electrumHosts } from '@/lib/chain/config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const call = electrumCaller(electrumHosts(), 6000);
+const call = fanoutCaller(electrumHosts(), 6000);
 
 export async function POST(req: Request) {
   let body: { method?: string; params?: unknown[] };

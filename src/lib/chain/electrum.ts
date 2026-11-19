@@ -96,3 +96,26 @@ export const RELAY_METHODS = new Set([
   'blockchain.block.headers',
   'server.features',
 ]);
+
+/**
+ * Like electrumCaller, but broadcasts go to every host in parallel (a tx relayed through one
+ * poorly-connected node can sit in its mempool unseen by miners). Succeeds if any host accepts it
+ * or already knows it. Reads use the normal failover client.
+ */
+export function fanoutCaller(hosts: string[], timeoutMs = 5000): ElectrumCall {
+  const primary = electrumCaller(hosts, timeoutMs);
+  const perHost = hosts.map((h) => electrumCaller([h], timeoutMs));
+  return async (method, ...params) => {
+    if (method !== 'blockchain.transaction.broadcast') return primary(method, ...params);
+    const results = await Promise.allSettled(perHost.map((c) => c(method, ...params)));
+    const ok = results.find((r) => r.status === 'fulfilled') as PromiseFulfilledResult<unknown> | undefined;
+    if (ok) return ok.value;
+    const errs = results.map((r) => String((r as PromiseRejectedResult).reason?.message ?? (r as PromiseRejectedResult).reason));
+    // Already known everywhere means it is out there: report success with the computed txid.
+    if (errs.every((e) => /already|known|txn-already-in-mempool|txn-already-known/i.test(e))) {
+      const { txidOf } = await import('./provider');
+      return txidOf(String(params[0]));
+    }
+    throw new Error(errs.join(' | '));
+  };
+}
