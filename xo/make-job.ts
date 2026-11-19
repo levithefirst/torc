@@ -9,7 +9,7 @@ import { decodeState, encodeState, decodeMember } from '../src/lib/torc/state';
 
 const rec = JSON.parse(readFileSync(process.argv[2] ?? 'deployments/chipnet-xo.json', 'utf8'));
 const seatAddress = process.argv[3]!;
-const p = new TorcProvider(relayCaller(process.env.TORC_RELAY_URL ?? 'https://torc-brown.vercel.app'), 'chipnet');
+const p = new TorcProvider(relayCaller(process.env.TORC_RELAY_URL ?? 'https://torc-cash.vercel.app'), 'chipnet');
 const params = paramsFromJson(rec.params);
 const c = circleContract(params, p);
 const st = findState(params, await c.getUtxos());

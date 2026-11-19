@@ -1,11 +1,11 @@
 // Local Electrum WebSocket endpoint backed by Torc's HTTPS relay (/api/chain).
 // For hosts whose egress only allows HTTPS (no raw Electrum WSS on :50004): the XO engine connects to
 // ws://127.0.0.1:PORT and this shim forwards requests to the relay, emulating subscriptions by polling.
-//   TORC_RELAY_URL=https://torc-brown.vercel.app node xo/electrum-relay-shim.mjs [port]
+//   TORC_RELAY_URL=https://torc-cash.vercel.app node xo/electrum-relay-shim.mjs [port]
 import { WebSocketServer } from 'ws';
 import { createHash } from 'node:crypto';
 
-const RELAY = (process.env.TORC_RELAY_URL ?? 'https://torc-brown.vercel.app').replace(/\/$/, '') + '/api/chain';
+const RELAY = (process.env.TORC_RELAY_URL ?? 'https://torc-cash.vercel.app').replace(/\/$/, '') + '/api/chain';
 const PORT = Number(process.argv[2] ?? process.env.SHIM_PORT ?? 50993);
 const POLL_MS = Number(process.env.SHIM_POLL_MS ?? 4000);
 const VERBOSE = !!process.env.SHIM_VERBOSE;

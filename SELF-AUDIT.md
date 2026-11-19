@@ -1,6 +1,6 @@
 # Self-audit
 
-Three two-minute passes over https://torc-brown.vercel.app and this repo, each as one BLAZE judge,
+Three two-minute passes over https://torc-cash.vercel.app and this repo, each as one BLAZE judge,
 on a 360 px phone viewport and on desktop. Every bug found is listed with what was done about it.
 Scores are honest guesses, /10: Innovation · Design & usability · Technical strength · Business potential.
 

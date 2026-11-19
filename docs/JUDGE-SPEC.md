@@ -1,6 +1,6 @@
 # Judge spec results
 
-`tests/judge.spec.ts` (Playwright 1.63) against **https://torc-brown.vercel.app**, projects mobile 360×780 (Pixel 7 UA, touch) and desktop 1440×900.
+`tests/judge.spec.ts` (Playwright 1.63) against **https://torc-cash.vercel.app**, projects mobile 360×780 (Pixel 7 UA, touch) and desktop 1440×900.
 
 Run 2026-11-19 14:26 UTC, deployment of commit 863fe9e: **14 / 14 passed** (26.7 s).
 

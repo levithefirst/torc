@@ -7,7 +7,7 @@ dollar amount (PUSD) into the circle every round, and a CashScript covenant pays
 member whose turn it is. Membership is a CashTokens NFT, the circle's state is a CashTokens NFT, and no
 collector (alajo) ever holds the money. There is no admin key.
 
-**Try it in 10 seconds:** https://torc-brown.vercel.app (chipnet). No wallet, no setup: the home page reads a live
+**Try it in 10 seconds:** https://torc-cash.vercel.app (chipnet). No wallet, no setup: the home page reads a live
 circle from the chain, and "Run the next step live" broadcasts a real transaction you watch land as SEEN 0-conf.
 
 <!-- 15-second GIF / screenshot slot: docs/media/torc-15s.gif (record per docs/DEMO-SCRIPT.md) -->
@@ -176,7 +176,7 @@ docs/                 SDK-NOTES, DEPLOYMENTS, LATENCY, XO, HANDOFF, DECK, DEMO-S
 npm install
 npm test                          # contracts + unit (no network)
 npm run dev                       # http://localhost:3000 (chipnet)
-BASE_URL=https://torc-brown.vercel.app npx playwright test
+BASE_URL=https://torc-cash.vercel.app npx playwright test
 NETWORK=chipnet npm run circle:inspect
 ```
 

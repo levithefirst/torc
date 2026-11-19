@@ -1,6 +1,6 @@
 # Latency (production, 10 runs)
 
-Measured on 19 Nov 2026, 14:51 to 15:12 UTC, against https://torc-brown.vercel.app (chipnet) with the judge spec
+Measured on 19 Nov 2026, 14:51 to 15:12 UTC, against https://torc-cash.vercel.app (chipnet) with the judge spec
 (`tests/judge.spec.ts`, desktop project 1440×900, headless Chromium), driven by `scripts/latency-runs.sh`.
 Raw rows: [`runs/latency-runs.jsonl`](runs/latency-runs.jsonl) (the 10 runs) and
 [`runs/latency-topup.jsonl`](runs/latency-topup.jsonl) (extra runs until 10 clicks had broadcast).

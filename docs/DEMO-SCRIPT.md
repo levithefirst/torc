@@ -1,6 +1,6 @@
 # Demo video script (2:00)
 
-Recorded on a Pixel 7 (screen recorder, portrait, mic on). Site: https://torc-brown.vercel.app.
+Recorded on a Pixel 7 (screen recorder, portrait, mic on). Site: https://torc-cash.vercel.app.
 No intro slide: the first frame is the live page. Voice-over below is 255 words.
 
 | Time | Shot (what is on screen) | Caption on screen | Voice-over |

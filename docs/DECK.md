@@ -15,7 +15,7 @@ Colours: ink #100E0B background, Torc Gold #CFA354 only for the turn seat / one 
 - Pitch: "In an ajo, the collector holds everyone's money. In Torc, nobody does. The ring pays whoever's turn it is, and only them."
 
 ## 3. Live demo (link + QR)
-- https://torc-brown.vercel.app — opens on a live circle read from the chain; "Run the next step live" broadcasts a real tx.
+- https://torc-cash.vercel.app — opens on a live circle read from the chain; "Run the next step live" broadcasts a real tx.
 - QR code to the URL. Screenshot of the ring + feed with a SEEN 0-conf row.
 
 ## 4. How the covenant works
