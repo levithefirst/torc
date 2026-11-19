@@ -20,4 +20,22 @@ The fee estimate was way off. It estimated around 960 sats, but it actually used
 
 The site was very clunky. You have to create an account before it shows you anything, and I can't link what I'm doing straight to a transaction. I had to find a workaround for that too.
 
-But at the end of the day, I made it work. The contribution went through XO and it was marked valid. That's about it.
+But at the end of the day, I made it work. The contribution went through XO and it was marked valid.
+
+## What I think XO should fix
+
+The most important one is the error messages. They should be accurate. That would have saved me a lot of hours of building, so if we can get those error messages under control, it will be very, very good.
+
+Also the whole invitation: right now I have to sign each input separately. If not, it crashes and tells me "merged input undefined". Please, if you can work on that, it will be a very big help.
+
+It should be able to watch its own wallet's coins automatically and track the wallet's addresses without being told.
+
+The P2SH setting: the naming can be very confusing. It could give us a warning when the script is already wrapped, so we don't lock the coins the wrong way.
+
+Freeing up the coins: after a failed send, when a broadcast doesn't go the right way or there's a timeout, the coins should be released automatically.
+
+We need more ways to connect, probably a proper HTTPS connection to the network, so I don't need to build a bridge.
+
+And shareable links: I should be able to open a transaction directly by its transaction ID in the link.
+
+Thanks.
