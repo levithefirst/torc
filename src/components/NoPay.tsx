@@ -1,4 +1,8 @@
 import { REPO_URL } from '@/lib/chain/config';
+import { DEMO } from '@/lib/app/demo';
+
+// Link the contract the live demo circle actually runs (BCH mode: TorcCircleBch.cash, lines 87-89).
+const CLAIM_CHECK = DEMO?.paramsJson.mode === 'bch' ? 'TorcCircleBch.cash#L87-L89' : 'TorcCircle.cash#L88-L90';
 
 /** The first question every savings-circle member asks, answered honestly: what Torc does today, and v2. */
 export function NoPay({ compact = false }: { compact?: boolean }) {
@@ -9,7 +13,7 @@ export function NoPay({ compact = false }: { compact?: boolean }) {
         <div>
           <h3 className="font-semibold">What happens today</h3>
           <ul className="mt-1 list-disc space-y-1 pl-5 text-text-2">
-            <li>The payout needs every seat paid (<a className="text-accent-text underline-offset-2 hover:underline" href={`${REPO_URL}/blob/main/contracts/TorcCircle.cash#L88-L90`}>claim() checks it</a>), so one missing payment pauses the round. Nobody, including the organiser, can take the pot early or run off with it.</li>
+            <li>The payout needs every seat paid (<a className="text-accent-text underline-offset-2 hover:underline" href={`${REPO_URL}/blob/main/contracts/${CLAIM_CHECK}`}>claim() checks it</a>), so one missing payment pauses the round. Nobody, including the organiser, can take the pot early or run off with it.</li>
             <li>The money already paid in stays locked in the covenant until the missing seat pays. There is no deadline, so a late payment still unlocks the round.</li>
             <li>A seat is an NFT, so a member who wants out can hand or sell their seat to someone who will keep paying.</li>
             <li>There is no refund or timeout yet. If a seat never pays, the paid-in money for that round stays stuck. A member who has already taken the pot and then stops paying is not stopped by v1 either. We say this up front because it is the main risk.</li>

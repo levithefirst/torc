@@ -10,7 +10,9 @@ import { REPO_URL, NETWORK } from '@/lib/chain/config';
 import { TxLink } from './TxLink';
 import Link from 'next/link';
 
-const contractUrl = (line: number) => `${REPO_URL}/blob/main/contracts/TorcCircle.cash#L${line}`;
+// The demo circle's own contract: BCH mode is TorcCircleBch.cash (claim() starts a line earlier).
+const contractFor = (mode: string) => (mode === 'bch' ? { file: 'TorcCircleBch.cash', claim: 71 } : { file: 'TorcCircle.cash', claim: 72 });
+const contractUrl = (file: string, line: number) => `${REPO_URL}/blob/main/contracts/${file}#L${line}`;
 
 export function fmtLocal(ms: number) {
   return new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }).format(ms);
@@ -61,6 +63,7 @@ export function JudgeMode({ initial, paramsJson, names, circleName, stale, event
   const params = useMemo(() => paramsFromJson(paramsJson), [paramsJson]);
   const { snap, status, refresh, setSnap } = useLiveSnapshot(params, initial);
   const asset = assetInfo(paramsJson);
+  const contract = contractFor(paramsJson.mode);
   const [now, setNow] = useState<number | null>(null);
   const [t, setT] = useState<TickState>({ s: 'idle' });
   const [prevTurn, setPrevTurn] = useState(initial?.turnSeat);
@@ -169,13 +172,13 @@ export function JudgeMode({ initial, paramsJson, names, circleName, stale, event
         {[
           { n: 1, title: 'Start a circle', body: 'One transaction mints a state NFT into the covenant and one member NFT per seat.', fn: 'genesis', line: 1, txid: showcase.genesis },
           { n: 2, title: 'Everyone pays in', body: 'contribute() sets your seat’s bit and locks exactly one contribution in the ring.', fn: 'contribute()', line: 25, txid: showcase.contribute },
-          { n: 3, title: 'The turn seat takes the pot', body: 'claim() pays the whole pot to the holder of the turn seat’s NFT, and nobody else.', fn: 'claim()', line: 72, txid: showcase.claim },
+          { n: 3, title: 'The turn seat takes the pot', body: 'claim() pays the whole pot to the holder of the turn seat’s NFT, and nobody else.', fn: 'claim()', line: contract.claim, txid: showcase.claim },
         ].map((s) => (
           <li key={s.n} className="rounded-[var(--radius)] border border-border-subtle p-3">
             <div className="font-semibold">{s.n}. {s.title}</div>
             <p className="mt-1 text-text-2">{s.body}</p>
             <div className="mt-2 flex flex-wrap gap-x-3 text-[12px]">
-              <a className="text-accent-text underline-offset-2 hover:underline" href={contractUrl(s.line)}>{s.fn} in TorcCircle.cash</a>
+              <a className="text-accent-text underline-offset-2 hover:underline" href={contractUrl(contract.file, s.line)}>{s.fn} in {contract.file}</a>
               {s.txid && <TxLink txid={s.txid} label={`tx ${shortTx(s.txid)}`} className="num text-accent-text underline-offset-2 hover:underline" />}
             </div>
           </li>
