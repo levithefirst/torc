@@ -11,6 +11,35 @@ import { DEMO } from '@/lib/app/demo';
 import { serverProvider } from '@/lib/server/chain';
 import { tick } from '@/lib/torc/demo';
 import { demoSeatKeys } from '@/lib/server/demoKeys';
+import { circleContract } from '@/lib/torc/circle';
+import { scripthashOf } from '@/lib/chain/provider';
+
+// Worst case cost (docs/DEMO-COST.md): money only moves seat -> covenant -> turn seat, so a drainer burns
+// fees only. A round is 3 contributions (once per seat) + 1 claim, and claim() needs 600 s of chain
+// time (MTP) since the last payout, so at most ~6 rounds per hour: 6 x (3 x 1,012 + 2,460) sats
+// = ~33,000 sats/hour in BCH mode at 1 sat/byte, whatever the number of server instances.
+// On top of that, a limit every instance shares because it is read from the chain: at most
+// MAX_UNCONFIRMED covenant txs (one full round) may sit unconfirmed at once.
+const MAX_UNCONFIRMED = 4;
+
+/** Browsers send Origin on a POST fetch; refuse cross-site callers (a speed bump, not auth). */
+function sameOrigin(req: Request): boolean {
+  const origin = req.headers.get('origin');
+  const host = req.headers.get('x-forwarded-host') ?? req.headers.get('host');
+  if (!origin || !host) return false;
+  try {
+    return new URL(origin).host === host;
+  } catch {
+    return false;
+  }
+}
+
+async function unconfirmedCovenantTxs(): Promise<number> {
+  if (!DEMO) return 0;
+  const lock = circleContract(DEMO.params, serverProvider).lockingBytecode;
+  const mem = (await serverProvider.call('blockchain.scripthash.get_mempool', scripthashOf(lock))) as unknown[];
+  return Array.isArray(mem) ? mem.length : 0;
+}
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -39,6 +68,12 @@ async function run(isCron: boolean) {
     return NextResponse.json({ ok: false, reason: 'wait', seconds, message: `The payout opens in about ${seconds} s of chain time` }, { status: 429 });
   }
   if (inFlight) return NextResponse.json({ ok: false, reason: 'wait', seconds: 5, message: 'A step is already being broadcast' }, { status: 429 });
+  try {
+    if ((await unconfirmedCovenantTxs()) >= MAX_UNCONFIRMED)
+      return NextResponse.json({ ok: false, reason: 'wait', seconds: 60, message: 'A full round is waiting for the next block. Try again after it is mined.' }, { status: 429 });
+  } catch {
+    // Mempool read failed: fall through; tick() reads the chain itself and the covenant still rules.
+  }
   const t0 = Date.now();
   const p = tick(serverProvider, DEMO.params, keys, isCron ? { holdClaimSeconds: CRON_HOLD_CLAIM_S } : {});
   inFlight = p;
@@ -57,7 +92,8 @@ async function run(isCron: boolean) {
   }
 }
 
-export async function POST() {
+export async function POST(req: Request) {
+  if (!sameOrigin(req)) return NextResponse.json({ ok: false, reason: 'error', message: 'cross-origin request refused' }, { status: 403 });
   return run(false);
 }
 
