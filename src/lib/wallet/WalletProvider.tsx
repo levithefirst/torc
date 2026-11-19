@@ -112,7 +112,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     const transaction = builder.generateWcTransactionObject({ broadcast: false, userPrompt: prompt });
     // The relay sends plain JSON: encode BigInt/Uint8Array as WizardConnect extended JSON
     // (`<bigint: Xn>`, `<Uint8Array: 0x..>`), which wallets decode with parseExtendedJson.
-    const relaySafe = JSON.parse(stringify(transaction));
+    // The transaction itself goes as hex (Paytaca decodes `transaction` with hexToBin; hex is
+    // valid per @bch-wc2/interfaces for every wallet).
+    const relaySafe = { ...JSON.parse(stringify(transaction)), transaction: builder.build() };
     const res = await m.signTransaction({ transaction: relaySafe as never, inputPaths });
     if (res.error || !res.signedTransaction) throw new Error(res.error || 'wallet returned no signature');
     const txid = await provider.sendRawTransaction(res.signedTransaction);
