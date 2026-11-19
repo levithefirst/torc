@@ -22,7 +22,7 @@ export async function readState(provider: TorcProvider, params: CircleParams) {
 }
 
 /** Perform the next due action using whichever demo seat it belongs to. */
-export async function tick(provider: TorcProvider, params: CircleParams, seats: SeatSigner[]): Promise<TickResult> {
+export async function tick(provider: TorcProvider, params: CircleParams, seats: SeatSigner[], opts: { holdClaimSeconds?: number } = {}): Promise<TickResult> {
   try {
     const { contract, utxos, state } = await readState(provider, params);
     const next = nextAction(state, params.seats, params.period);
@@ -50,6 +50,11 @@ export async function tick(provider: TorcProvider, params: CircleParams, seats: 
         if (locktime < next.opensAt) {
           const seconds = next.opensAt - locktime;
           return { ok: false, reason: 'wait', seconds, message: `Payout opens when the chain clock passes ${next.opensAt} (about ${Math.ceil(seconds / 60)} min of chain time).` };
+        }
+        // Scheduled runs leave an open payout for a visitor's click (the moment the demo is for)
+        // and only take it themselves once it has been open for holdClaimSeconds.
+        if (opts.holdClaimSeconds && locktime < next.opensAt + opts.holdClaimSeconds) {
+          return { ok: false, reason: 'wait', seconds: next.opensAt + opts.holdClaimSeconds - locktime, message: 'Payout is open; leaving it for a visitor to run.' };
         }
         const { builder } = buildClaim({ provider, params, contract, contractUtxos: utxos, wallet: holder.wallet, memberNft, locktime });
         const tx = await builder.send();

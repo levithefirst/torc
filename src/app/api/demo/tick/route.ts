@@ -17,6 +17,8 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
 const COOLDOWN_MS = 60_000;
+// Cron fills the round but leaves an open payout for a visitor for up to 6 h of chain time.
+const CRON_HOLD_CLAIM_S = 6 * 3600;
 let lastActionAt = 0;
 let claimNext = false; // the last action completed a round: the payout may follow at once
 let claimWaitUntil = 0; // the covenant said the payout is not open yet: answer from memory until then
@@ -38,13 +40,15 @@ async function run(isCron: boolean) {
   }
   if (inFlight) return NextResponse.json({ ok: false, reason: 'wait', seconds: 5, message: 'A step is already being broadcast' }, { status: 429 });
   const t0 = Date.now();
-  const p = tick(serverProvider, DEMO.params, keys);
+  const p = tick(serverProvider, DEMO.params, keys, isCron ? { holdClaimSeconds: CRON_HOLD_CLAIM_S } : {});
   inFlight = p;
   try {
     const r = await p;
     if (r.ok) {
       lastActionAt = Date.now();
       claimNext = r.claimNext;
+    } else if (r.reason === 'wait' && isCron) {
+      // A cron hold is not a covenant wait: visitors may still run the payout now.
     } else if (r.reason === 'wait') claimWaitUntil = Date.now() + Math.min(Math.max(r.seconds, 5), 600) * 1000;
     else claimNext = false;
     return NextResponse.json({ ...r, ms: Date.now() - t0 }, { status: r.ok ? 200 : r.reason === 'wait' ? 429 : r.reason === 'error' ? 500 : 409 });
