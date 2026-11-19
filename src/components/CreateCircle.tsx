@@ -137,7 +137,7 @@ function Form() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <ConnectButton />
-          <button type="button" disabled={!valid || w.state !== 'connected' || !!busy} onClick={create} className="rounded-[var(--radius)] bg-accent px-4 py-2 text-sm font-semibold text-on-accent disabled:opacity-50" data-testid="btn-create">
+          <button type="button" disabled={!valid || w.state !== 'connected' || !!busy} onClick={create} className={`rounded-[var(--radius)] px-4 py-2 text-sm font-semibold disabled:opacity-60 ${w.state === 'connected' ? 'bg-accent text-on-accent' : 'border border-border text-text-2'}`} data-testid="btn-create">
             {busy ? 'Check your wallet…' : 'Create circle'}
           </button>
           <button type="button" onClick={dryRun} className="rounded-[var(--radius)] border border-border px-4 py-2 text-sm" data-testid="btn-dry-run">Dry run (no wallet)</button>
