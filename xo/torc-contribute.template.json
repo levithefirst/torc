@@ -291,7 +291,8 @@
       "description": "P2SH32 TorcCircle covenant: holds the state NFT and the pot. Pays only the turn seat.",
       "icon": "contract",
       "lockingType": "p2sh",
-      "lockingBytecode": "torcLockingBytecode",
+      "lockingBytecode": "torcRedeemBytecode",
+      "unlockingBytecode": "unlockContribute",
       "selectable": false,
       "roles": {
         "member": {
@@ -337,8 +338,7 @@
   },
   "scripts": {
     "torcRedeemBytecode": "<period> <seats> <contribution> <$(<assetCategory> OP_REVERSEBYTES)> <$(<circleCategory> OP_REVERSEBYTES)> 0x5579009c63c0009d00c778517e00ce788851ce53798851cf517f758176577a9f6900cf76557f7781050102040810537a7f77517f75816e965297009d00cd55798800d1547a8800cc00c69d00d3009d00d2537a557f75729351807e8851cd8851d17b8851d37b9d51cc02e8039d52cd51c78852d18852d251cf877777675579519c63c0009d00c778517e00ce788851ce53798800cf76517f7501007e8178517f77547f75817b557f778151cf517f758153795a79979d0601020408102059797f77517f75818c9d7802ff009f69587a93b17500cd53798800d17b8800cc00c69d00d3009d8b5280517f7500d27cc554807e01007e88c355795293a26952c7788852ce53798852d054799d53c7788853ce53798853d054799d54c7788854ce53798854d054799d547953a06355c7788855ce53798855d054799d68547954a06356c7788856ce53798856d054799d6851cd51c78851d1537a8851d3537a547a959d52cd51c78852d17b8852d251cf87777767557a529dc052a269c0547a8ba169c0c700c78800ce7c517e8800d2517f7500cf517f7587917777776868",
-    "torcLockingBytecode": "OP_HASH256 <$(<torcRedeemBytecode> OP_HASH256)> OP_EQUAL",
-    "unlockContribute": "<0> <torcRedeemBytecode>",
+    "unlockContribute": "<0>",
     "lockSeat": "OP_DUP OP_HASH160 <$(<memberKey.public_key> OP_HASH160)> OP_EQUALVERIFY OP_CHECKSIG",
     "unlockSeat": "<memberKey.schnorr_signature.all_outputs> <memberKey.public_key>"
   },

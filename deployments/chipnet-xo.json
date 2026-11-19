@@ -4,14 +4,14 @@
   "params": {
     "network": "chipnet",
     "mode": "token",
-    "assetCategory": "fb9175ea28b49f530d1e21d521f52c91cf52db90c07af4c5bffbb85fcbb725d4",
+    "assetCategory": "834987644df6c0007e03b20afe1706b710febbfd13db96cf9d433f34957a6689",
     "contribution": "10",
     "seats": 3,
     "period": 600,
-    "circleCategory": "5443dec9a585d8ecfa38e2172cc5079080b8f8b5ca43a0bc1247c1b262df5541"
+    "circleCategory": "20042383c1fd8d7513b31f791154119883816d1c2f4467b640dd577e82e6b031"
   },
-  "covenantAddress": "bchtest:pv76ecpyx7xwfj7nzq2hfq6fmq8k6qey9xkqj9qkccl3dj975cdp7ccsv0erw",
-  "covenantTokenAddress": "bchtest:rv76ecpyx7xwfj7nzq2hfq6fmq8k6qey9xkqj9qkccl3dj975cdp72tvdkc69",
+  "covenantAddress": "bchtest:p02zgd8zwmm3v6lqusqj7phj7dhhzax03h8dtgx45ftgcnqyvky554a092mt2",
+  "covenantTokenAddress": "bchtest:r02zgd8zwmm3v6lqusqj7phj7dhhzax03h8dtgx45ftgcnqyvky558wnyn6jp",
   "seatNames": [
     "Ade",
     "Yemi (XO wallet)",
@@ -21,14 +21,21 @@
     "ade",
     "bisi"
   ],
-  "genesisTxid": "4b5fab238dd2ac29d4325a449a4ba77deb62f4aa9ccf982bb1fbc60b73dd297e",
-  "assetName": "tPUSD",
+  "genesisTxid": "6efc2706ca1e7941f589b5f0b229e0f93938f34dd7c306091d4fec167a654dc7",
+  "assetName": "tPUSD (XO run)",
   "assetDecimals": 2,
   "events": [
     {
       "kind": "genesis",
-      "txid": "4b5fab238dd2ac29d4325a449a4ba77deb62f4aa9ccf982bb1fbc60b73dd297e",
-      "at": "2026-11-19T09:34:36.926Z"
+      "txid": "6efc2706ca1e7941f589b5f0b229e0f93938f34dd7c306091d4fec167a654dc7",
+      "at": "2026-11-19T14:07:57.526Z"
+    },
+    {
+      "kind": "contribute",
+      "txid": "140817f19a39d8e974d23e57e51d2c9e02edf37729bc18956ca1935b0cca11a8",
+      "seat": 1,
+      "round": 0,
+      "at": "2026-11-19T14:13:47.000Z"
     }
   ]
 }

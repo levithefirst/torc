@@ -123,8 +123,11 @@ const template = {
   lockingScripts: {
     torcCovenant: {
       ...n('Torc covenant', 'P2SH32 TorcCircle covenant: holds the state NFT and the pot. Pays only the turn seat.', 'contract'),
+      // lockingType p2sh makes the engine (Libauth p2sh32) wrap the named script itself, so this names the
+      // redeem script. Naming an already-wrapped OP_HASH256 <h> OP_EQUAL script would wrap it twice.
       lockingType: 'p2sh',
-      lockingBytecode: 'torcLockingBytecode',
+      lockingBytecode: 'torcRedeemBytecode',
+      unlockingBytecode: 'unlockContribute',
       selectable: false,
       roles: { member: { relevant: false } },
     },
@@ -147,9 +150,8 @@ const template = {
     // The TorcCircle redeem script exactly as CashScript builds it: constructor args (reversed order,
     // categories in serialized byte order) then the compiled body.
     torcRedeemBytecode: `<period> <seats> <contribution> <$(<assetCategory> OP_REVERSEBYTES)> <$(<circleCategory> OP_REVERSEBYTES)> 0x${body}`,
-    torcLockingBytecode: 'OP_HASH256 <$(<torcRedeemBytecode> OP_HASH256)> OP_EQUAL',
-    // contribute() is function 0 of TorcCircle: selector, then the redeem script.
-    unlockContribute: '<0> <torcRedeemBytecode>',
+    // contribute() is function 0 of TorcCircle: the selector; p2sh32 compilation appends the redeem script.
+    unlockContribute: '<0>',
     lockSeat: 'OP_DUP OP_HASH160 <$(<memberKey.public_key> OP_HASH160)> OP_EQUALVERIFY OP_CHECKSIG',
     unlockSeat: '<memberKey.schnorr_signature.all_outputs> <memberKey.public_key>',
   },

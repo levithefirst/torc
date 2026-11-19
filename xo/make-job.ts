@@ -1,5 +1,6 @@
 // Builds the job file for `xo-runner.mjs contribute`: circle state + the member's outpoints, read live.
 import { readFileSync, writeFileSync } from 'node:fs';
+import { binToHex, hexToBin, encodeDataPush, flattenBinArray } from '@bitauth/libauth';
 import { relayCaller } from '../src/lib/chain/electrum';
 import { TorcProvider } from '../src/lib/chain/provider';
 import { circleContract, paramsFromJson } from '../src/lib/torc/circle';
@@ -24,7 +25,10 @@ const job = {
   },
   member: { seatCommitment: seat.token!.nft!.commitment, seatSatoshis: Number(seat.satoshis), paymentTokens: Number(pay.token!.amount), paymentSatoshis: Number(pay.satoshis) },
   inputs: [st, seat, pay].map((u) => ({ txid: u.txid, vout: u.vout })),
+  // The circle role supplies the covenant input's unlocking bytecode itself: contribute() is function 0, so
+  // <0> <redeemScript> (what the template's unlockContribute compiles to). The engine only signs inputs it tracks.
+  stateUnlockingBytecode: binToHex(flattenBinArray([Uint8Array.of(0), encodeDataPush(hexToBin(c.bytecode))])),
   expect: { covenantLockingBytecode: c.lockingBytecode },
 };
-writeFileSync('/tmp/claude-0/xo-job.json', JSON.stringify(job, null, 2));
+writeFileSync(process.env.XO_JOB ?? '/tmp/xo-job.json', JSON.stringify(job, null, 2));
 console.log(JSON.stringify(job, null, 2));
