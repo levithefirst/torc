@@ -36,12 +36,12 @@ const template = {
       ...n('Pay into the circle', 'Pay this round’s fixed contribution into the Torc covenant. The covenant marks the seat as paid.', 'send'),
       roles: {
         member: {
-          ...n('Pay into the circle', 'Pay $(<contribution>) units of the circle asset for seat $(<seatCommitment> <1> OP_SPLIT OP_DROP OP_BIN2NUM <1> OP_ADD).', 'send'),
+          ...n('Pay into the circle', 'Pay $(<contribution>) units of the circle asset with seat $(<seatCommitment>).', 'send'),
           requirements: { variables: ['seatCommitment', 'seatSatoshis', 'paymentTokens', 'paymentSatoshis', 'memberLockingScript'] },
         },
         circle: {
           ...n('Provide circle state', 'Supply the circle’s current state UTXO and parameters.', 'contract'),
-          requirements: { variables: ['circleCategory', 'assetCategory', 'contribution', 'seats', 'period', 'stateSatoshis', 'stateCommitment'] },
+          requirements: { variables: ['circleCategory', 'assetCategory', 'contribution', 'seats', 'period', 'stateSatoshis', 'stateCommitment', 'nextStateCommitment'] },
         },
       },
       requirements: { participants: [{ role: 'member', slots: { min: 1, max: 1 } }, { role: 'circle', slots: { min: 1, max: 1 } }] },
@@ -55,7 +55,7 @@ const template = {
       outputs: [{ output: 'seatReceiveOutput' }],
     },
     contributeTransaction: {
-      ...n('Paid into the circle', 'Paid $(<contribution>) into a Torc circle; next state $(nextStateCommitment).', 'send'),
+      ...n('Paid into the circle', 'Paid $(<contribution>) into a Torc circle; next state $(<nextStateCommitment>).', 'send'),
       inputs: [
         { input: 'stateInput', inputIndex: 0 },
         { input: 'seatInput', inputIndex: 1 },
@@ -98,7 +98,7 @@ const template = {
       ...n('Circle state', 'State NFT with this seat’s paid bit set. Same round, same round start.', 'contract'),
       lockingScript: 'torcCovenant',
       valueSatoshis: '$(<stateSatoshis>)',
-      token: { category: '$(<circleCategory>)', amount: '0', nft: { capability: 'mutable', commitment: '$(nextStateCommitment)' } },
+      token: { category: '$(<circleCategory>)', amount: '0', nft: { capability: 'mutable', commitment: '$(<nextStateCommitment>)' } },
       roles: { member: { relevant: false } },
     },
     contributionOutput: {
@@ -152,10 +152,6 @@ const template = {
     unlockContribute: '<0> <torcRedeemBytecode>',
     lockSeat: 'OP_DUP OP_HASH160 <$(<memberKey.public_key> OP_HASH160)> OP_EQUALVERIFY OP_CHECKSIG',
     unlockSeat: '<memberKey.schnorr_signature.all_outputs> <memberKey.public_key>',
-    // 2^seat via the same lookup table the covenant uses.
-    seatBit: '<0x0102040810> <$(<seatCommitment> <1> OP_SPLIT OP_DROP OP_BIN2NUM)> OP_SPLIT OP_NIP <1> OP_SPLIT OP_DROP OP_BIN2NUM',
-    // round | roundStart unchanged; paidMask + bit.
-    nextStateCommitment: '<stateCommitment> <5> OP_SPLIT OP_BIN2NUM seatBit OP_ADD <1> OP_NUM2BIN OP_CAT',
   },
   constants: {
     contributionDust: { ...n('Contribution dust', 'Sats every contribution UTXO carries (enforced by the covenant).', 'coins'), type: 'satoshis', value: '1000' },
@@ -170,6 +166,7 @@ const template = {
     period: { ...n('Round length', 'Minimum seconds between payouts.', 'clock'), type: 'integer' },
     stateSatoshis: { ...n('State sats', 'Sats on the state NFT UTXO (constant).', 'coins'), type: 'satoshis' },
     stateCommitment: { ...n('Circle state', 'round (1) | roundStart (4 LE) | paidMask (1).', 'contract'), type: 'bytes' },
+    nextStateCommitment: { ...n('Next state', 'State after this payment: same round and round start, this seat\u2019s paid bit set. Supplied by the circle; the covenant rejects any other value.', 'contract'), type: 'bytes' },
     seatCommitment: { ...n('Seat', 'Member NFT commitment: seat index (1) | version (1).', 'ticket'), type: 'bytes' },
     seatSatoshis: { ...n('Seat sats', 'Sats on the member NFT UTXO.', 'coins'), type: 'satoshis' },
     paymentTokens: { ...n('Payment tokens', 'Asset amount on the payment UTXO.', 'coins'), type: 'token_amount' },

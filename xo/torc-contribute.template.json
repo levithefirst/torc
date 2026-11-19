@@ -73,7 +73,7 @@
       "roles": {
         "member": {
           "name": "Pay into the circle",
-          "description": "Pay $(<contribution>) units of the circle asset for seat $(<seatCommitment> <1> OP_SPLIT OP_DROP OP_BIN2NUM <1> OP_ADD).",
+          "description": "Pay $(<contribution>) units of the circle asset with seat $(<seatCommitment>).",
           "icon": "send",
           "requirements": {
             "variables": [
@@ -97,7 +97,8 @@
               "seats",
               "period",
               "stateSatoshis",
-              "stateCommitment"
+              "stateCommitment",
+              "nextStateCommitment"
             ]
           }
         }
@@ -137,7 +138,7 @@
     },
     "contributeTransaction": {
       "name": "Paid into the circle",
-      "description": "Paid $(<contribution>) into a Torc circle; next state $(nextStateCommitment).",
+      "description": "Paid $(<contribution>) into a Torc circle; next state $(<nextStateCommitment>).",
       "icon": "send",
       "inputs": [
         {
@@ -235,7 +236,7 @@
         "amount": "0",
         "nft": {
           "capability": "mutable",
-          "commitment": "$(nextStateCommitment)"
+          "commitment": "$(<nextStateCommitment>)"
         }
       },
       "roles": {
@@ -339,9 +340,7 @@
     "torcLockingBytecode": "OP_HASH256 <$(<torcRedeemBytecode> OP_HASH256)> OP_EQUAL",
     "unlockContribute": "<0> <torcRedeemBytecode>",
     "lockSeat": "OP_DUP OP_HASH160 <$(<memberKey.public_key> OP_HASH160)> OP_EQUALVERIFY OP_CHECKSIG",
-    "unlockSeat": "<memberKey.schnorr_signature.all_outputs> <memberKey.public_key>",
-    "seatBit": "<0x0102040810> <$(<seatCommitment> <1> OP_SPLIT OP_DROP OP_BIN2NUM)> OP_SPLIT OP_NIP <1> OP_SPLIT OP_DROP OP_BIN2NUM",
-    "nextStateCommitment": "<stateCommitment> <5> OP_SPLIT OP_BIN2NUM seatBit OP_ADD <1> OP_NUM2BIN OP_CAT"
+    "unlockSeat": "<memberKey.schnorr_signature.all_outputs> <memberKey.public_key>"
   },
   "constants": {
     "contributionDust": {
@@ -405,6 +404,12 @@
     "stateCommitment": {
       "name": "Circle state",
       "description": "round (1) | roundStart (4 LE) | paidMask (1).",
+      "icon": "contract",
+      "type": "bytes"
+    },
+    "nextStateCommitment": {
+      "name": "Next state",
+      "description": "State after this payment: same round and round start, this seat’s paid bit set. Supplied by the circle; the covenant rejects any other value.",
       "icon": "contract",
       "type": "bytes"
     },
