@@ -1,0 +1,10 @@
+{"run": 1, "exit": 0, "state_ms": 1211, "at": "2026-11-19T14:28:36.107Z", "zeroconf_ms": 159, "outcome": "wait", "txid": null, "wait": "Next step available in 50 s"}
+{"run": 2, "exit": 0, "state_ms": 893, "at": "2026-11-19T14:29:49.940Z", "zeroconf_ms": 1400, "outcome": "seen", "txid": "0180b3fddd0e24740839b8903883c1d4467234ddefef9dcd290ed4432f28edd4", "wait": null}
+{"run": 3, "exit": 0, "state_ms": 867, "at": "2026-11-19T14:31:05.949Z", "zeroconf_ms": 1384, "outcome": "seen", "txid": "c01faa0e72f23e1a87bb1b6ccee84dfd2a02073dacd45fad8c87e1d509caf65b", "wait": null}
+{"run": 4, "exit": 0, "state_ms": 1319, "at": "2026-11-19T14:32:21.793Z", "zeroconf_ms": 1338, "outcome": "wait", "txid": null, "wait": "Next step available in 151 s"}
+{"run": 5, "exit": 0, "state_ms": 1156, "at": "2026-11-19T14:33:36.953Z", "zeroconf_ms": 844, "outcome": "wait", "txid": null, "wait": "Next step available in 75 s"}
+{"run": 6, "exit": 0, "state_ms": 1125, "at": "2026-11-19T14:34:51.271Z", "zeroconf_ms": 235, "outcome": "wait", "txid": null, "wait": "Next step available in 75 s"}
+{"run": 7, "exit": 0, "state_ms": 1167, "at": "2026-11-19T14:36:05.245Z", "zeroconf_ms": 218, "outcome": "wait", "txid": null, "wait": "Next step available in 58 s"}
+{"run": 8, "exit": 0, "state_ms": 997, "at": "2026-11-19T14:37:18.989Z", "zeroconf_ms": 221, "outcome": "wait", "txid": null, "wait": "Next step available in 37 s"}
+{"run": 9, "exit": 0, "state_ms": 1092, "at": "2026-11-19T14:38:32.708Z", "zeroconf_ms": 222, "outcome": "wait", "txid": null, "wait": "Next step available in 37 s"}
+{"run": 10, "exit": 0, "state_ms": 1123, "at": "2026-11-19T14:39:46.890Z", "zeroconf_ms": 238, "outcome": "wait", "txid": null, "wait": "Next step available in 6 s"}

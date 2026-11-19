@@ -1,2 +1,0 @@
-{"run": 1, "exit": 0, "state_ms": 1211, "at": "2026-11-19T14:28:36.107Z", "zeroconf_ms": 159, "outcome": "wait", "txid": null, "wait": "Next step available in 50 s"}
-{"run": 2, "exit": 0, "state_ms": 893, "at": "2026-11-19T14:29:49.940Z", "zeroconf_ms": 1400, "outcome": "seen", "txid": "0180b3fddd0e24740839b8903883c1d4467234ddefef9dcd290ed4432f28edd4", "wait": null}
