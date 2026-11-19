@@ -1,0 +1,5 @@
+{"at":"2026-11-19T14:26:07.662Z","test":"time-to-state","project":"mobile","ms":863}
+{"at":"2026-11-19T14:26:10.516Z","test":"time-to-0conf","project":"mobile","ms":2025,"kind":"seen","txid":"a59b9b08b0f7ae0c0e46cb59a3dea72ab3c865a0931c3765231df71f34171379"}
+{"at":"2026-11-19T14:26:19.847Z","test":"time-to-state","project":"desktop","ms":728}
+{"at":"2026-11-19T14:26:23.544Z","test":"time-to-0conf","project":"desktop","ms":2933,"kind":"seen","txid":"f9a927bc0ff6b68c8b0e52900e58b86a783826fe0bed65c972198a12e2703ccc"}
+{"at":"2026-11-19T14:26:27.189Z","test":"lcp","project":"desktop","ms":200}
