@@ -84,18 +84,18 @@ export function relayCaller(baseUrl: string): ElectrumCall {
   };
 }
 
-/** Methods the public relay will forward. Read-only, plus broadcast (anyone may broadcast). */
+/**
+ * Methods the public relay will forward: exactly what the app calls (TorcProvider reads, the demo
+ * tick's mempool check, and broadcast of a signed tx). Anything else is refused.
+ */
 export const RELAY_METHODS = new Set([
   'blockchain.scripthash.listunspent',
   'blockchain.scripthash.get_history',
   'blockchain.scripthash.get_mempool',
   'blockchain.transaction.get',
-  'blockchain.transaction.get_merkle',
   'blockchain.transaction.broadcast',
   'blockchain.headers.get_tip',
-  'blockchain.block.header',
   'blockchain.block.headers',
-  'server.features',
 ]);
 
 /**
