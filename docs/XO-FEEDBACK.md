@@ -1,41 +1,20 @@
-# XO feedback
+# XO feedback (levithefirst, own words)
 
-*Written by Fluid (@levithefirst), dictated and lightly cleaned up for filler words only.*
+I think the idea behind XO is a very good one. One transaction can go out to several people, and each of them adds their part and their signature. That fits the savings circle I was building very well, and it's the most positive thing I have to say about XO. In the end I made it work: Torc's contribution went through the XO engine and the inspector marked it valid.
 
-I think the idea of XO is a very good one. It's an app that allows one transaction to be sent to several people, and each of those people can add their parts and their signatures. So yes, it fits the savings circle I was trying to build very well. That's the really positive thing I have about XO.
+The setup was very complex. I was on one of the newest Python versions and had to find a workaround, which was not a pleasant experience. Connecting was also hard. The engine only reaches the network one way, so I had to build a bridge to get around it.
 
-The setup was very, very complex, because I used one of the newest Python versions, so I had to find a workaround. That was not a pleasant experience at all.
+The error messages cost me the most time. "Stack size not valid" annoyed me most, because I hadn't even signed anything yet. Another was "merge input undefined", when the real issue was that it needed to know which input to sign. The engine also can't see the wallet's coins, so I had to add an extra step for that.
 
-Also, the way of connecting is very hard. It only connects to the network in one way, so I had to build a bridge to get around it.
+P2SH was a big problem. The contract got wrapped twice, so my first attempt locked the coins the wrong way. The docs should cover this, or at least warn about it. Every failed try also kept the coins reserved until I cleared them by hand. The fee estimate was way off, about 960 sats estimated against roughly 1,600 sats actually used. The site is clunky too. It makes you create an account before it shows you anything, and I couldn't link what I was doing straight to a transaction without a workaround.
 
-A lot of error messages kept popping up. "Stack size not valid" was the one that annoyed me the most, because the issue wasn't that at all: I had not signed anything yet. It also brought out another error message, "merged input undefined", and the main issue was just that it needed to know which part to sign.
-
-Another issue is that the engine can't see the wallet's coins, so I had to add an extra step to make that possible.
-
-P2SH was a big problem too, because it was wrapping the contract twice. On my first attempt it locked the coins the wrong way. I think something about that should be put in the docs, or at least a warning, so we don't have to go through all that stress.
-
-Because it took a long while and I was doing a lot of things in between while building this, every failed try just kept the coins in reserve until I cleared them manually.
-
-The fee estimate was way off. It estimated around 960 sats, but it actually used 1,600.
-
-The site was very clunky. You have to create an account before it shows you anything, and I can't link what I'm doing straight to a transaction. I had to find a workaround for that too.
-
-But at the end of the day, I made it work. The contribution went through XO and it was marked valid.
-
-## What I think XO should fix
-
-The most important one is the error messages. They should be accurate. That would have saved me a lot of hours of building, so if we can get those error messages under control, it will be very, very good.
-
-Also the whole invitation: right now I have to sign each input separately. If not, it crashes and tells me "merged input undefined". Please, if you can work on that, it will be a very big help.
-
-It should be able to watch its own wallet's coins automatically and track the wallet's addresses without being told.
-
-The P2SH setting: the naming can be very confusing. It could give us a warning when the script is already wrapped, so we don't lock the coins the wrong way.
-
-Freeing up the coins: after a failed send, when a broadcast doesn't go the right way or there's a timeout, the coins should be released automatically.
-
-We need more ways to connect, probably a proper HTTPS connection to the network, so I don't need to build a bridge.
-
-And shareable links: I should be able to open a transaction directly by its transaction ID in the link.
+What I'd fix, most important first:
+1. Accurate error messages. That alone would have saved me hours.
+2. Signing. Right now I have to sign each input separately, or it crashes with "input undefined" or "merge input undefined".
+3. Watching your own wallet. It should track the wallet's address and see its own coins automatically.
+4. A P2SH warning. The naming is confusing, so warn when a script is already wrapped, so nobody locks coins the wrong way.
+5. Releasing coins automatically after a failed send, a bad broadcast or a timeout.
+6. More ways to connect, such as a proper HTTPS connection to the network, so no bridge is needed.
+7. Shareable links. I should be able to open a transaction directly by its txid in the URL.
 
 Thanks.
